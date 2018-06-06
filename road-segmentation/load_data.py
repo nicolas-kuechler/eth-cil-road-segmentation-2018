@@ -11,11 +11,9 @@ class Dataset():
         self.config = config
 
     def build_dataset(self):
-        batch_size = self.config['batch_size']
-
         p = self.build_pipeline()
         # TODO check output type
-        ds = tf.data.Dataset.from_generator(lambda: p.tf_generator(batch_size), (tf.uint8, tf.uint8))
+        ds = tf.data.Dataset.from_generator(lambda: p.tf_generator(), (tf.uint8, tf.uint8))
         return ds
 
 
@@ -127,52 +125,32 @@ class CustomPipeline(Augmentor.Pipeline):
     def __init__(self, source_directory=None, output_directory="output", save_format=None):
         Augmentor.Pipeline.__init__(self, source_directory, output_directory, save_format)
 
-    def tf_generator(self, batch_size):
-
+    def tf_generator(self):
         while True:
+            # Randomly select images for augmentation and yield the augmented images.
 
-            # Randomly select batch_size images for augmentation and yield the
-            # augmented images.
-            # X = np.array([])
-            # Y = np.array([])
+            # select random image
+            random_image_index = random.randint(0, len(self.augmentor_images)-1)
 
-            X = []
-            Y = []
+            # apply pipeline operations to image and groundtruth
+            images = self._tf_execute(self.augmentor_images[random_image_index])
 
-            for i in range(batch_size):
-                # select random image
-                random_image_index = random.randint(0, len(self.augmentor_images)-1)
+            # reshape image
+            img_array = np.asarray(images[0])
+            w = img_array.shape[0]
+            h = img_array.shape[1]
+            c = 1 if np.ndim(img_array) == 2 else img_array.shape[2]
+            img_array = img_array.reshape(w, h, c)
 
-                # apply pipeline operations to image and groundtruth
-                images = self._tf_execute(self.augmentor_images[random_image_index])
+            # TODO check if necessary?
+            # reshape groundtruth
+            gt_array = np.asarray(images[1])
+            w = gt_array.shape[0]
+            h = gt_array.shape[1]
+            c = 1 if np.ndim(gt_array) == 2 else gt_array.shape[2]
+            gt_array = gt_array.reshape(w, h, c)
 
-                # reshape image
-                img_array = np.asarray(images[0])
-                w = img_array.shape[0]
-                h = img_array.shape[1]
-                c = 1 if np.ndim(img_array) == 2 else img_array.shape[2]
-                img_array = img_array.reshape(w, h, c)
-                X.append(img_array)
-
-                # reshape groundtruth
-                gt_array = np.asarray(images[1])
-                w = gt_array.shape[0]
-                h = gt_array.shape[1]
-                c = 1 if np.ndim(gt_array) == 2 else gt_array.shape[2]
-                gt_array = gt_array.reshape(w, h, c)
-                Y.append(gt_array)
-
-
-                print('img_array:', img_array.shape)
-                print('gt_array:', gt_array.shape)
-
-            X = np.asarray(X)
-            Y = np.asarray(Y)
-
-            print('X:', X.shape)
-            print('Y:', Y.shape)
-
-            yield (X, Y)
+            yield (img_array, gt_array)
 
 
     def _tf_execute(self, augmentor_image):
