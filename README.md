@@ -6,6 +6,7 @@ For this problem, we provide a set of satellite/aerial images acquired from Goog
 
 ## Useful Links
 * [Trello Board](https://trello.com/b/D4NLabKT/cil)
+* [Paper](https://v2.overleaf.com/7312313351mjgnqnjnsncf)
 * [Kaggle](https://www.kaggle.com/c/cil-road-segmentation-2018)
 * [Leonhard Wiki](https://scicomp.ethz.ch/wiki/Getting_started_with_clusters)
 * [Tensorflow Doc](https://www.tensorflow.org/api_docs/python/)
