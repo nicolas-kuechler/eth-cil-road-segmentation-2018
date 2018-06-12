@@ -4,9 +4,23 @@ config = {}
 
 config['batch_size'] = 4
 
-config['path_to_data'] = './training/images'
-config['path_to_groundtruth'] = './training/groundtruth'
-config['seed'] = None
+config['base_dir'] = './../'
+
+config['train'] = {
+    'path_to_data': config['base_dir'] + 'data/training/images',
+    'path_to_groundtruth': config['base_dir'] + 'data/training/groundtruth',
+    'seed': None
+}
+
+config['valid'] = {
+    'path_to_data': config['base_dir'] + 'data/validation/images',
+    'path_to_groundtruth': config['base_dir'] + 'data/validation/groundtruth',
+    'seed': None
+}
+
+config['test'] = {
+    'path_to_data': config['base_dir'] + 'data/test_images',
+}
 
 # AFFINE TRANSFORMATION AUGMENTATION
 

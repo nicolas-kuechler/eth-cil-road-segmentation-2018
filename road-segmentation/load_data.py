@@ -2,26 +2,57 @@ import numpy as np
 import tensorflow as tf
 import Augmentor
 from PIL import Image
-import random
-
+import random, os
+from utility import image_split_and_merge
+import time
 
 class Dataset():
+
+    output_type = tf.uint8
 
     def __init__(self, config):
         self.config = config
 
-    def build_dataset(self):
-        p = self.build_pipeline()
-        # TODO check output type
-        ds = tf.data.Dataset.from_generator(lambda: p.tf_generator(), (tf.uint8, tf.uint8))
+    def build_dataset(self, split):
+        """ Build the Dataset
+        :param split: Which training split to load, must be one of ['train', 'valid', 'test'].
+        """
+
+        assert split in ['train', 'valid', 'test']
+
+        if split == 'test':
+            image_dir = self.config['test']['path_to_data']
+            images = []
+
+            for filename in os.listdir(image_dir):
+                # load image
+                img = np.asarray(Image.open(image_dir + '/' + filename))
+                # reshape image for concatenation
+                img = img.reshape(1, img.shape[0], img.shape[1], img.shape[2])
+
+                # TODO [nku] add option to split into patches
+                #patches = image_split_and_merge.split_into_patches(image=img, patch_size=(120, 120, 3), stride=61)
+                #patch_flat, flatten_index = image_split_and_merge.flatten_patches(patches)
+
+                images.append(img)
+
+            patches = np.concatenate(images)
+
+            ds = tf.data.Dataset.from_tensor_slices(patches)
+
+        else: # train or valid
+            p = self.build_augmentation_pipeline(split)
+            ds = tf.data.Dataset.from_generator(lambda: p.tf_generator(), (self.output_type, self.output_type))
+
         return ds
 
 
-    def build_pipeline(self):
+    def build_augmentation_pipeline(self, split):
+
         # Create a pipeline
-        p = CustomPipeline(self.config['path_to_data'])
-        p.ground_truth(self.config['path_to_groundtruth'])
-        p.set_seed(self.config.get('seed')) # set seed if provided
+        p = CustomPipeline(self.config[split]['path_to_data'])
+        p.ground_truth(self.config[split]['path_to_groundtruth'])
+        p.set_seed(self.config[split].get('seed')) # set seed if provided
 
         # AFFINE TRANSFORMATION AUGMENTATION
 
@@ -122,7 +153,7 @@ class Dataset():
 
 
 class CustomPipeline(Augmentor.Pipeline):
-    def __init__(self, source_directory=None, output_directory="output", save_format=None):
+    def __init__(self, source_directory=None, output_directory='output', save_format=None):
         Augmentor.Pipeline.__init__(self, source_directory, output_directory, save_format)
 
     def tf_generator(self):
