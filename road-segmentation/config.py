@@ -20,6 +20,11 @@ config['valid'] = {
 
 config['test'] = {
     'path_to_data': config['base_dir'] + 'data/test_images',
+    'method': {
+        'name':'patch',     # patch or full
+        'patch_size': 120,  # only for patch
+        'stride': 61        # only for patch
+    } 
 }
 
 # AFFINE TRANSFORMATION AUGMENTATION

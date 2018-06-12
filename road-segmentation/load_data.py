@@ -4,7 +4,7 @@ import Augmentor
 from PIL import Image
 import random, os
 from utility import image_split_and_merge
-import time
+import time, re
 
 class Dataset():
 
@@ -23,22 +23,36 @@ class Dataset():
         if split == 'test':
             image_dir = self.config['test']['path_to_data']
             images = []
+            index = []
+
+            method = self.config['test']['method']
+            assert method['name'] in ['patch', 'full']
 
             for filename in os.listdir(image_dir):
                 # load image
                 img = np.asarray(Image.open(image_dir + '/' + filename))
-                # reshape image for concatenation
-                img = img.reshape(1, img.shape[0], img.shape[1], img.shape[2])
 
-                # TODO [nku] add option to split into patches
-                #patches = image_split_and_merge.split_into_patches(image=img, patch_size=(120, 120, 3), stride=61)
-                #patch_flat, flatten_index = image_split_and_merge.flatten_patches(patches)
+                # extract id
+                id = int(re.search('\d+', filename).group(0))
+
+                if(method['name']=='patch'):
+                    patches = image_split_and_merge.split_into_patches(image=img, patch_size=(method['patch_size'], method['patch_size'], 3), stride=method['stride'])
+                    patches_flatten, idx = image_split_and_merge.flatten_patches(patches, id)
+                    img = patches_flatten
+                else: # method == full
+                    # reshape image for concatenation
+                    img = img.reshape(1, img.shape[0], img.shape[1], img.shape[2])
+                    idx = [id] # build index entry
 
                 images.append(img)
+                index.append(idx)
 
-            patches = np.concatenate(images)
+            images = np.concatenate(images)
+            index = np.concatenate(index)
 
-            ds = tf.data.Dataset.from_tensor_slices(patches)
+            assert(images.shape[0]==index.shape[0])
+
+            ds = tf.data.Dataset.from_tensor_slices((images, index)) # index consists of image id, patch_row, patch_col
 
         else: # train or valid
             p = self.build_augmentation_pipeline(split)

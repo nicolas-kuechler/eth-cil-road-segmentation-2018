@@ -33,10 +33,11 @@ with tf.Session() as sess:
 
     if split == 'test':
         print(split)
-        image = sess.run(value)
+        image, index = sess.run(value)
         print('Test Image Shape: ', image.shape)
         plt.imshow(image)
         plt.show()
+        print('Index: ', index)
 
     else:
         x1, y1 = sess.run(value)
