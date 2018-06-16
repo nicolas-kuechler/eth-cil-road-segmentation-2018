@@ -3,24 +3,27 @@ import numpy as np
 
 class Training():
 
-    def __init__(self, sess, training_config, model):
+    def __init__(self, sess, config, model):
         self.sess = sess
-        self.config = training_config
+        self.config = config
         self.model = model
 
     def train(self):
 
         init = tf.global_variables_initializer()
         self.sess.run(init)
-        for epoch in range(self.config['n_epochs']):
+        for epoch in range(self.config.N_EPOCHS):
             print('EPOCH: ', epoch)
 
             # Training
             print('Start Training')
             self.sess.run(self.model.dataset.init_op_train) # switch to training dataset
-            for i in range(self.config['n_batches_per_epoch']):
+            for i in range(self.config.N_BATCHES_PER_EPOCH):
                 # train step
-                loss, _, mse = self.sess.run([self.model.loss, self.model.train_op, self.model.mse])
+                loss, _, mse, labels, predictions = self.sess.run([self.model.loss, self.model.train_op, self.model.mse, self.model.labels, self.model.predictions])
+
+                print('Labels: ', labels.shape)
+                print('Predictions: ', predictions.shape)
                 print('Loss: ', loss)
                 # TODO [nku] write to summary
             print('End of Training Set')
@@ -38,7 +41,10 @@ class Training():
                     # has a disadvantage because for an image he has "more border"
                     # with the test set this disadvantage is countered by
                     # overlapping and averaged patches -> maybe can do this here aswell?
-                    mse_sum += self.sess.run(self.model.mse)
+                    valid_out = self.sess.run([self.model.mse, self.model.labels, self.model.predictions])
+
+
+                    mse_sum += valid_out[0]
                     count += 1
                 except tf.errors.OutOfRangeError:
                     print('End of Validation Set')

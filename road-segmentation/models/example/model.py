@@ -1,7 +1,7 @@
 import tensorflow as tf
-from models.abstract_model import AbstractModel
+from core.abstract_model import AbstractModel
 
-class SimpleModel(AbstractModel):
+class Model(AbstractModel):
 
     def __init__(self, config, dataset):
         super().__init__(config, dataset)
@@ -17,4 +17,4 @@ class SimpleModel(AbstractModel):
         # Define predictions, train_op, loss
         self.predictions = conv
         self.loss = tf.losses.mean_squared_error(self.labels, self.predictions)
-        self.train_op = tf.train.AdamOptimizer().minimize(self.loss)
+        self.train_op = tf.train.AdamOptimizer(self.lr).minimize(self.loss, global_step=self.global_step)

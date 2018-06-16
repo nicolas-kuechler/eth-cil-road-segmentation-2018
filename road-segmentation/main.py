@@ -1,38 +1,44 @@
+import sys, importlib, pickle
 import tensorflow as tf
+from core.dataset import Dataset
+from core.training import Training
+from core.evaluation import Evaluation
 
-from dataset.dataset import Dataset
-from dataset.ds_config import ds_config
-from training.training import Training
-from training.training_config import train_config
 
-from models.simple.simple_model import SimpleModel
+# Parse Argument to Load Model and Config
+model_name = str(sys.argv[1])
+mode = str(sys.argv[2])
 
-# Load config
-config = {
-    'dataset_config': ds_config,
-    'model_config': {},
-    'training_config' : train_config,
-    'evaluation_config' :{}
-}
+
+model_module = importlib.import_module('models.' + model_name + ".model")
+Model = model_module.Model
+
+config_module = importlib.import_module('models.' + model_name + ".config")
+Config = config_module.Config
+
+
+config = Config()
+print('Loading Model: ', config.MODEL_NAME)
+
+# TODO [nku] export the config to some json file
 
 # create dataset
-dataset = Dataset(config['dataset_config'])
+dataset = Dataset(config)
 print('Created Dataset')
 
 # create model
-model = SimpleModel(config['model_config'], dataset)
+model = Model(config, dataset)
 print('Created Model')
 
-
-# create Training
 sess = tf.Session()
-training = Training(sess, config['training_config'], model)
-print('Created Training')
 
-training.train()
-print('Finished Training')
-
-
-# create Evaluation
-#evaluation = evaluation(sess, evaluation_config, model)
-#evaluation.eval()
+if mode == 'train':
+    training = Training(sess, config, model)
+    print('Created Training')
+    training.train()
+    print('Finished Training')
+elif mode == 'test':
+    evaluation = Evaluation(sess, config, model)
+    evaluation.eval()
+else:
+    raise ValueError('mode "{}" unknown.'.format(mode))
