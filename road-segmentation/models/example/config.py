@@ -1,8 +1,9 @@
 from core.abstract_config import AbstractConfig
 
 class Config(AbstractConfig):
-    # Define a Model Name
-    MODEL_NAME = 'example-model'
+
+    def __init__(self, model_name: str):
+        super().__init__(model_name)
 
 
     # Overwrite any Configurations from Abstract Config

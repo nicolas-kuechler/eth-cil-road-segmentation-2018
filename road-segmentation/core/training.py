@@ -8,29 +8,38 @@ class Training():
         self.config = config
         self.model = model
 
+        init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+        self.sess.run(init)
+
+        self.model.load(self.sess) # load the model if it exists
+
+        self.summary_writer_train = tf.summary.FileWriter(self.config.SUMMARY_TRAIN_DIR, self.sess.graph)
+        self.summary_writer_valid = tf.summary.FileWriter(self.config.SUMMARY_VALID_DIR, self.sess.graph)
+
     def train(self):
 
-        init = tf.global_variables_initializer()
-        self.sess.run(init)
-        for epoch in range(self.config.N_EPOCHS):
-            print('EPOCH: ', epoch)
+        for epoch in range(self.sess.run(self.model.epoch), self.config.N_EPOCHS):
+            print('Start Epoch: ', epoch)
 
             # Training
-            print('Start Training')
             self.sess.run(self.model.dataset.init_op_train) # switch to training dataset
-            for i in range(self.config.N_BATCHES_PER_EPOCH):
-                # train step
-                loss, _, mse, labels, predictions = self.sess.run([self.model.loss, self.model.train_op, self.model.mse, self.model.labels, self.model.predictions])
 
-                print('Labels: ', labels.shape)
-                print('Predictions: ', predictions.shape)
-                print('Loss: ', loss)
-                # TODO [nku] write to summary
-            print('End of Training Set')
+            for i in range(self.config.N_BATCHES_PER_EPOCH):
+                step = tf.train.global_step(self.sess, self.model.global_step)
+
+                # train step
+                fetches = {
+                    'train_op': self.model.train_op,
+                    'loss': self.model.loss,
+                    'summary': self.model.summary_train
+                }
+                train_output = self.sess.run(fetches)
+
+                self.summary_writer_train.add_summary(train_output['summary'], global_step=step)
 
 
             # Validation
-            print('Start Validation')
+            print('Start Validation...')
             self.sess.run(self.model.dataset.init_op_valid) # switch to validation dataset
             mse_sum = 0
             count = 0
@@ -41,17 +50,32 @@ class Training():
                     # has a disadvantage because for an image he has "more border"
                     # with the test set this disadvantage is countered by
                     # overlapping and averaged patches -> maybe can do this here aswell?
-                    valid_out = self.sess.run([self.model.mse, self.model.labels, self.model.predictions])
 
+                    fetches = {
+                        'mse': self.model.mse,
+                        'summary': self.model.summary_valid
+                    }
+                    valid_output = self.sess.run(fetches)
 
-                    mse_sum += valid_out[0]
+                    self.summary_writer_valid.add_summary(valid_output['summary'], global_step=step)
+
+                    mse_sum += valid_output['mse']
                     count += 1
                 except tf.errors.OutOfRangeError:
-                    print('End of Validation Set')
-                    break
+                    break # end of dataset
 
-            # Calculate Root Mean Squared Error
+            # Calculate Root Mean Squared Error and Write to Summary
             rmse = np.sqrt(mse_sum / float(count))
-            print('RMSE: ', rmse)
+            rmse_valid = self.sess.run(self.model.summary_valid_rmse, {self.model.rmse_valid_pl: rmse})
+            self.summary_writer_valid.add_summary(rmse_valid, global_step=step)
 
-            # TODO [nku] write to summary
+            print('RMSE: ', rmse)
+            print('Validation Finished')
+
+            # save checkpoints every x'th epoch
+            if (epoch + 1) % self.config.SAVE_CHECKPOINTS_EVERY_EPOCH == 0:
+                self.model.save(self.sess)
+
+            self.sess.run(self.model.epoch_increment_op) # increment epoch counter
+
+        self.model.save(self.sess) # save the model after training

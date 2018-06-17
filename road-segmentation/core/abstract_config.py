@@ -1,7 +1,23 @@
 from abc import ABC
 import numpy as np
+import os
 
 class AbstractConfig(ABC):
+
+    def __init__(self, model_name: str):
+        self.MODEL_NAME = model_name
+
+        self.OUTPUT_DIR = self.BASE_DIR + 'output/' + self.MODEL_NAME + '/'
+        if not os.path.exists(self.OUTPUT_DIR):
+            os.makedirs(self.OUTPUT_DIR)
+
+        self.CHECKPOINT_DIR = self.OUTPUT_DIR + 'checkpoints/'
+        if not os.path.exists(self.CHECKPOINT_DIR):
+            os.makedirs(self.CHECKPOINT_DIR)
+
+        self.SUMMARY_TRAIN_DIR = self.OUTPUT_DIR + 'train_summary'
+        self.SUMMARY_VALID_DIR = self.OUTPUT_DIR + 'valid_summary'
+
 
     BASE_DIR = './../'
 
@@ -66,10 +82,13 @@ class AbstractConfig(ABC):
        | |/ -_) ' \(_-</ _ \ '_|  _| / _ \ V  V /
        |_|\___|_||_/__/\___/_| |_| |_\___/\_/\_/
     '''
+
     MAX_CHECKPOINTS_TO_KEEP = 10
-    CHECKPOINT_DIR = BASE_DIR + 'output'# TODO [nku] define checkpoint dir
+    SAVE_CHECKPOINTS_EVERY_EPOCH = 5
+
     CHECKPOINT_ID = None # if None, the last checkpoint will be used
 
+    SUMMARY_IMAGE_MAX_OUTPUTS = 3
 
 
     '''
