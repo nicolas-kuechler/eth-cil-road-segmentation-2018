@@ -13,6 +13,26 @@ For this problem, we provide a set of satellite/aerial images acquired from Goog
 
 ## Getting Started
 
+### Create a new Model
+
+* Create Directory in Folder models/model_name (e.g. models/example)
+* Create a config.py file with a class Config extending AbstractConfig
+* adjust any configurations from the AbstractConfig file
+* Create a model.py file with a class Model extending AbstractModel
+* implement the build_model() method and set all necessary variables
+
+### Run a Model
+
+```
+python main.py model_name mode
+```
+
+where model_name is the name of your model (defined by the folder it is in) and mode is either train or test
+
+Example:
+```
+python main.py example train
+```
 
 ### Prerequisites
 

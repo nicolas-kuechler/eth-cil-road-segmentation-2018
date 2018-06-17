@@ -44,7 +44,6 @@ def flatten_patches(patches: np.ndarray, id: str):
     rows, cols, _ , patch_h, patch_w, c = patches.shape
     patches_flatten =  patches.reshape(rows * cols, patch_h, patch_w, c)
 
-#    index = np.zeros((3rows * cols))
 
     index = [[id,row,col] for row, col in itertools.product(range(rows), range(cols))]
     index = np.array(index)
