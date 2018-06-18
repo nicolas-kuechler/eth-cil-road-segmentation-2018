@@ -84,7 +84,7 @@ class AbstractConfig(ABC):
     '''
 
     MAX_CHECKPOINTS_TO_KEEP = 10
-    SAVE_CHECKPOINTS_EVERY_EPOCH = 5
+    SAVE_CHECKPOINTS_EVERY_EPOCH = 1
 
     CHECKPOINT_ID = None # if None, the last checkpoint will be used
 
@@ -154,7 +154,7 @@ class AbstractConfig(ABC):
 
     # performs a random, elastic gaussian distortion on an image
     # param see https://github.com/mdbloice/Augmentor/blob/master/Augmentor/Pipeline.py
-    AUG_GAUSSIAN_DISTORTION_PROB = 0.0
+    AUG_GAUSSIAN_DISTORTION_PROB = 0.0000000000001
     AUG_GAUSSIAN_DISTORTION_GRID_WIDTH = 5
     AUG_GAUSSIAN_DISTORTION_GRID_HEIGHT = 5
     AUG_GAUSSIAN_DISTORTION_MAGNITUDE = 3
@@ -167,7 +167,7 @@ class AbstractConfig(ABC):
 
     # Performs a random, elastic distortion on an image.
     # grid: 2-10, magnitude: 1-10
-    AUG_RANDOM_DISTORTION_PROB = 0.0
+    AUG_RANDOM_DISTORTION_PROB = 0.0000000000001
     AUG_RANDOM_DISTORTION_GRID_WIDTH = 5
     AUG_RANDOM_DISTORTION_GRID_HEIGHT = 5
     AUG_RANDOM_DISTORTION_MAGNITUDE = 3

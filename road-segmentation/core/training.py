@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+from tqdm import tqdm
 
 class Training():
 
@@ -24,7 +25,7 @@ class Training():
             # Training
             self.sess.run(self.model.dataset.init_op_train) # switch to training dataset
 
-            for i in range(self.config.N_BATCHES_PER_EPOCH):
+            for i in tqdm(range(self.config.N_BATCHES_PER_EPOCH)):
                 step = tf.train.global_step(self.sess, self.model.global_step)
 
                 # train step
@@ -53,7 +54,7 @@ class Training():
 
                     fetches = {
                         'mse': self.model.mse,
-                        'summary': self.model.summary_valid
+                        #'summary': self.model.summary_valid
                     }
                     valid_output = self.sess.run(fetches)
 

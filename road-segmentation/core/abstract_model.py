@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import tensorflow as tf
+import numpy as np
 
 class AbstractModel(ABC):
     def __init__(self, config, dataset, mode):
@@ -22,6 +23,8 @@ class AbstractModel(ABC):
         self.build_model()
         self.build_mse() # for a fair comparison the validation always uses mse
         self.build_summaries()
+        self.n_params = np.sum([np.prod(v.get_shape().as_list()) for v in tf.trainable_variables()])
+
 
         # ensure that model defines predictions, loss and train_op
         assert(self.images is not None), "images (input) must be defined by model"

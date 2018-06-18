@@ -36,7 +36,7 @@ print('Dataset Created')
 
 print('\nCreating Model...')
 model = Model(config, dataset, mode)
-print('Model Created')
+print('Created Model with {} parameters'.format(model.n_params))
 
 sess = tf.Session()
 
