@@ -108,7 +108,7 @@ class Dataset():
                 img_patches = isam.split_into_patches(image=img, patch_size=(patch_size, patch_size, 3), stride=stride)
                 img_patches_flatten, ids = isam.flatten_patches(img_patches, id)
 
-                for img_patch, id in zip(img_patches_flatten, ids): # TODO [nku] check if this loops as expected
+                for img_patch, id in zip(img_patches_flatten, ids): 
                     yield(img_patch, id)
             else:
                 yield(img, id)

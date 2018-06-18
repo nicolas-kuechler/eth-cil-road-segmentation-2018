@@ -58,7 +58,7 @@ class Training():
                     }
                     valid_output = self.sess.run(fetches)
 
-                    self.summary_writer_valid.add_summary(valid_output['summary'], global_step=step)
+                    #self.summary_writer_valid.add_summary(valid_output['summary'], global_step=step)
 
                     mse_sum += valid_output['mse']
                     count += 1
@@ -78,5 +78,7 @@ class Training():
                 self.model.save(self.sess)
 
             self.sess.run(self.model.epoch_increment_op) # increment epoch counter
+            print('epoch inc: ', self.sess.run(self.model.epoch))
+            print('gobal_step: ', self.sess.run(self.model.global_step))
 
         self.model.save(self.sess) # save the model after training

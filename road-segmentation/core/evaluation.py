@@ -1,4 +1,7 @@
 import tensorflow as tf
+import numpy as np
+from PIL import Image
+from utility import image_split_and_merge as isam
 
 class Evaluation():
 
@@ -7,21 +10,64 @@ class Evaluation():
         self.config = config
         self.model = model
 
+        init = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+        self.sess.run(init)
+
+        self.model.load(sess) # load the model
+
     def eval(self):
+        print('\nStarting Evaluation...')
         self.sess.run(self.model.dataset.init_op_test) # switch to test dataset
-        # TODO [nku] Implement Evaluation of Test Set
-        raise NotImplementedError('Evaluation of Test Set not Implemented yet')
+
+        predictions = []
+        labels =  []
+
         # loop through test dataset and get predictions
         while(True):
             try:
-                # process batch
-                predictions, labels = self.sess.run([self.model.predictions, self.model.labels])
-                print('Lables: ', labels.shape)
-                # TODO [nku] add datastructure that keeps all predictions and labels and allows to combine them
+                fetches = {
+                    'predictions': self.model.predictions,
+                    'labels': self.model.labels
+                }
+
+                output = self.sess.run(fetches)
+
+                predictions.append(output['predictions'])
+                labels.append(output['labels'])
+
             except tf.errors.OutOfRangeError:
-                print('End of Test Set')
                 break
 
-        # TODO [nku] if patched combine to complete image
+        labels = np.concatenate(labels, axis=0)
+        predictions = np.concatenate(predictions, axis=0)
 
-        # TODO [nku] write submission file or maybe simply write output masks
+        if self.config.TEST_METHOD_NAME == 'patch':
+            # if patch based -> put images back together
+
+            n_patches_per_image = int(self.config.TEST_N_PATCHES_PER_IMAGE**2)
+            n_images = int(predictions.shape[0] / n_patches_per_image)
+
+            for i in range(n_images):
+                start = i * n_patches_per_image
+                end = start + n_patches_per_image
+
+                img = isam.merge_into_image_from_flatten(patches_flatten=predictions[start:end, : ,: , :],
+                                                index=labels[start:end, :],
+                                                image_size=(self.config.TEST_IMAGE_SIZE, self.config.TEST_IMAGE_SIZE, 1),
+                                                stride=self.config.TEST_METHOD_STRIDE)
+                img_id = labels[start, 0]
+
+                img = Image.fromarray(img[:,:,0])
+                img.save(self.config.TEST_OUTPUT_DIR + 'out{}.png'.format(img_id))
+
+        elif self.config.TEST_METHOD_NAME == 'full':
+            n_images = predictions.shape[0]
+
+            for i in range(n_images):
+                img = Image.fromarray(predictions[i, :, :, 0].astype('uint8'))
+                img_id = labels[i, 0]
+                img.save(self.config.TEST_OUTPUT_DIR + 'out{}.png'.format(img_id))
+        else:
+            raise ValueError('Unknown Test Method Name')
+
+        print('Evaluation Finished: saved {} masks to {}'.format(n_images, self.config.TEST_OUTPUT_DIR))

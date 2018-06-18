@@ -47,7 +47,6 @@ if mode == 'train':
 
 elif mode == 'test':
     evaluation = Evaluation(sess, config, model)
-    model.load() # load the model
     evaluation.eval()
 else:
     raise ValueError('mode "{}" unknown.'.format(mode))

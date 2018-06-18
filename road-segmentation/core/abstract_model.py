@@ -18,13 +18,12 @@ class AbstractModel(ABC):
         self.mse = None
         self.init_global_step_counter()
         self.init_epoch_counter()
-        self.init_saver()
         self.init_learning_rate()
         self.build_model()
         self.build_mse() # for a fair comparison the validation always uses mse
         self.build_summaries()
         self.n_params = np.sum([np.prod(v.get_shape().as_list()) for v in tf.trainable_variables()])
-
+        self.init_saver()
 
         # ensure that model defines predictions, loss and train_op
         assert(self.images is not None), "images (input) must be defined by model"
@@ -49,7 +48,11 @@ class AbstractModel(ABC):
             self.epoch_increment_op = tf.assign_add(self.epoch, 1, name='increment_epoch')
 
     def init_saver(self):
-        self.saver = tf.train.Saver(max_to_keep=self.config.MAX_CHECKPOINTS_TO_KEEP, save_relative_paths=True)
+        var_list = tf.trainable_variables()
+        var_list.append(self.global_step)
+        var_list.append(self.epoch)
+
+        self.saver = tf.train.Saver(var_list=var_list, max_to_keep=self.config.MAX_CHECKPOINTS_TO_KEEP, save_relative_paths=True)
 
     def init_learning_rate(self):
         # configure learning rate

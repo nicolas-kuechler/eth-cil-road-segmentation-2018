@@ -18,6 +18,9 @@ class AbstractConfig(ABC):
         self.SUMMARY_TRAIN_DIR = self.OUTPUT_DIR + 'train_summary'
         self.SUMMARY_VALID_DIR = self.OUTPUT_DIR + 'valid_summary'
 
+        self.TEST_OUTPUT_DIR = self.OUTPUT_DIR + 'test_output/'
+        if not os.path.exists(self.TEST_OUTPUT_DIR):
+            os.makedirs(self.TEST_OUTPUT_DIR)
 
     BASE_DIR = './../'
 
@@ -31,6 +34,7 @@ class AbstractConfig(ABC):
     '''
     TRAIN_PATH_TO_DATA = BASE_DIR + 'data/training/images'
     TRAIN_PATH_TO_GROUNDTRUTH = BASE_DIR + 'data/training/groundtruth'
+    TRAIN_IMAGE_SIZE = 400
     TRAIN_BATCH_SIZE = 20
     TRAIN_SEED = None
 
@@ -68,13 +72,14 @@ class AbstractConfig(ABC):
        |_|\___/__/\__|
     '''
     TEST_PATH_TO_DATA = BASE_DIR + 'data/test_images'
+    TEST_IMAGE_SIZE = 608
     TEST_BATCH_SIZE = 20
 
     TEST_METHOD_NAME = 'patch'     # patch or full
     TEST_METHOD_PATCH_SIZE = 120   # only for patch
     TEST_METHOD_STRIDE = 61        # only for patch
 
-
+    TEST_N_PATCHES_PER_IMAGE = (TEST_IMAGE_SIZE - TEST_METHOD_PATCH_SIZE)/ TEST_METHOD_STRIDE + 1
 
     '''
       _____                      __ _
