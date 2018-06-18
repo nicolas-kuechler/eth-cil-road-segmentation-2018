@@ -108,6 +108,6 @@ class AbstractModel(ABC):
             checkpoint_path = os.path.join(os.path.abspath(self.config.CHECKPOINT_DIR), 'model-{}'.format(checkpoint_id))
 
         if checkpoint_path:
-            print("Loading model checkpoint {} ...\n".format(checkpoint_path))
+            print("Loading model checkpoint {} ...".format(checkpoint_path))
             self.saver.restore(sess, checkpoint_path)
             print("Model loaded")

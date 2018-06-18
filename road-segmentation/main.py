@@ -20,10 +20,6 @@ config = Config(model_name)
 
 print('Setting Output Directory: ', config.OUTPUT_DIR)
 
-
-
-
-
 print('Loading Model: ', config.MODEL_NAME)
 
 # TODO [nku] create and set output folder in config if not there yet (in models/model_name/output)

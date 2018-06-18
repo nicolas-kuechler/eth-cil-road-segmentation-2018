@@ -11,9 +11,10 @@ class Config(AbstractConfig):
     VALID_METHOD_PATCH_SIZE = 200
     VALID_METHOD_STRIDE = 200
 
-    N_BATCHES_PER_EPOCH = 200
+    N_EPOCHS = 30
+    N_BATCHES_PER_EPOCH = 300
     TRAIN_BATCH_SIZE = 2
 
-    LEARNING_RATE = 0.1
-    
+    LEARNING_RATE = 1.0
+
     # Define new Configurations for your Model
