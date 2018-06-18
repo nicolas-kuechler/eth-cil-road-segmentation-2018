@@ -35,10 +35,10 @@ class AbstractConfig(ABC):
     TRAIN_SEED = None
 
     TRAIN_METHOD_NAME = 'patch' # patch or full
-    TRAIN_METHOD_PATCH_SIZE_PERCENTAGE = 0.25  # only for patch, the size of the patch in percentage of the original image size
+    TRAIN_METHOD_PATCH_SIZE_PERCENTAGE = 0.5  # only for patch, the size of the patch in percentage of the original image size
 
-    N_EPOCHS = 4
-    N_BATCHES_PER_EPOCH = 10
+    N_EPOCHS = 10
+    N_BATCHES_PER_EPOCH = 100
 
     LEARNING_RATE_TYPE = 'fixed' # in ['exponential', 'linear', 'fixed']
     LEARNING_RATE = 1.0
@@ -57,8 +57,8 @@ class AbstractConfig(ABC):
     VALID_BATCH_SIZE = 20
 
     VALID_METHOD_NAME = 'patch'     # patch or full
-    VALID_METHOD_PATCH_SIZE = 100   # only for patch
-    VALID_METHOD_STRIDE = 100        # only for patch
+    VALID_METHOD_PATCH_SIZE = 200   # only for patch
+    VALID_METHOD_STRIDE = 200        # only for patch
 
 
     '''
@@ -88,7 +88,7 @@ class AbstractConfig(ABC):
 
     CHECKPOINT_ID = None # if None, the last checkpoint will be used
 
-    SUMMARY_IMAGE_MAX_OUTPUTS = 3
+    SUMMARY_IMAGE_MAX_OUTPUTS = 10
 
 
     '''
@@ -99,43 +99,43 @@ class AbstractConfig(ABC):
                |___/
     '''
     # flip (mirror) the image along either its horizontal or vertical axis.
-    AUG_FLIP_RANDOM_PROB = 0.2
+    AUG_FLIP_RANDOM_PROB = 0.3
 
     # flip (mirror) the image along its horizontal axis, i.e. from left to right.
-    AUG_FLIP_LEFT_RIGHT_PROB = 0.2
+    AUG_FLIP_LEFT_RIGHT_PROB = 0.3
 
     # flip (mirror) the image along its vertical axis, i.e. from top to bottom.
-    AUG_FLIP_TOP_BOTTOM_PROB = 0.2
+    AUG_FLIP_TOP_BOTTOM_PROB = 0.3
 
     # rotate an image by either 90, 180, or 270 degrees, selected randomly.
-    AUG_ROTATE_RANDOM_90_PROB = 0.2
+    AUG_ROTATE_RANDOM_90_PROB = 0.3
 
     # rotate an image by an arbitrary amount and crop the largest possible rectangle.
     # max_left_rotation: 1- 25, max_right_rotation: 1-25
-    AUG_ROTATE_PROB = 0.2
+    AUG_ROTATE_PROB = 0.3
     AUG_ROTATE_MAX_LEFT_ROTATION = 15
     AUG_ROTATE_MAX_RIGHT_ROTATION = 15
 
     # shear the image by a specified number of degrees.
     # max_shear_left: 1-25, max_shear_right: 1-25
-    AUG_SHEAR_PROB = 0.2
+    AUG_SHEAR_PROB = 0.3
     AUG_SHEAR_MAX_SHEAR_LEFT = 15
     AUG_SHEAR_MAX_SHEAR_RIGHT = 15
 
     # zooms into an image at a random location within the image.
     AUG_ZOOM_RANDOM_PROB = 0.2
-    AUG_ZOOM_RANDOM_PERCENTAGE_AREA = 0.5
+    AUG_ZOOM_RANDOM_PERCENTAGE_AREA = 0.80
     AUG_ZOOM_RANDOM_RANDOMISE_PERCENTAGE_AREA = True
 
     # random change brightness of an image
     # min_factor: 0.0-1.0 black-original, max_factor: 0.0-1.0 black-original
-    AUG_RANDOM_BRIGHTNESS_PROB = 0.2
+    AUG_RANDOM_BRIGHTNESS_PROB = 0.3
     AUG_RANDOM_BRIGHTNESS_MIN_FACTOR = 0.9
     AUG_RANDOM_BRIGHTNESS_MAX_FACTOR = 0.95
 
     # random change image contrast
     # min_factor: 0.0-1.0 grey-original, max_factor: 0.0-1.0 grey-original
-    AUG_RANDOM_CONTRAST_PROB = 0.2
+    AUG_RANDOM_CONTRAST_PROB = 0.3
     AUG_RANDOM_CONTRAST_MIN_FACTOR = 0.9
     AUG_RANDOM_CONTRAST_MAX_FACTOR = 0.95
 
@@ -154,7 +154,7 @@ class AbstractConfig(ABC):
 
     # performs a random, elastic gaussian distortion on an image
     # param see https://github.com/mdbloice/Augmentor/blob/master/Augmentor/Pipeline.py
-    AUG_GAUSSIAN_DISTORTION_PROB = 0.2
+    AUG_GAUSSIAN_DISTORTION_PROB = 0.0
     AUG_GAUSSIAN_DISTORTION_GRID_WIDTH = 5
     AUG_GAUSSIAN_DISTORTION_GRID_HEIGHT = 5
     AUG_GAUSSIAN_DISTORTION_MAGNITUDE = 3
@@ -167,7 +167,7 @@ class AbstractConfig(ABC):
 
     # Performs a random, elastic distortion on an image.
     # grid: 2-10, magnitude: 1-10
-    AUG_RANDOM_DISTORTION_PROB = 0.2
+    AUG_RANDOM_DISTORTION_PROB = 0.0
     AUG_RANDOM_DISTORTION_GRID_WIDTH = 5
     AUG_RANDOM_DISTORTION_GRID_HEIGHT = 5
     AUG_RANDOM_DISTORTION_MAGNITUDE = 3
