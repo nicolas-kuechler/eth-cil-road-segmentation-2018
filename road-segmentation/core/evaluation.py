@@ -10,7 +10,7 @@ class Evaluation():
     def eval(self):
         self.sess.run(self.model.dataset.init_op_test) # switch to test dataset
         # TODO [nku] Implement Evaluation of Test Set
-
+        raise NotImplementedError('Evaluation of Test Set not Implemented yet')
         # loop through test dataset and get predictions
         while(True):
             try:
