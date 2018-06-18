@@ -35,7 +35,7 @@ dataset = Dataset(config)
 print('Dataset Created')
 
 print('\nCreating Model...')
-model = Model(config, dataset)
+model = Model(config, dataset, mode)
 print('Model Created')
 
 sess = tf.Session()

@@ -2,9 +2,12 @@ from abc import ABC, abstractmethod
 import tensorflow as tf
 
 class AbstractModel(ABC):
-    def __init__(self, config, dataset):
+    def __init__(self, config, dataset, mode):
         self.config = config
         self.dataset = dataset
+
+        assert(mode in ['train', 'test']), "mode must be either train or test"
+        self.mode = mode
 
         self.images = None      # input of neural network
         self.predictions = None # output layer of neural network

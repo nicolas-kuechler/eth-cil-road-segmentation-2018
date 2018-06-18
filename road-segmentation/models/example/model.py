@@ -3,8 +3,8 @@ from core.abstract_model import AbstractModel
 
 class Model(AbstractModel):
 
-    def __init__(self, config, dataset):
-        super().__init__(config, dataset)
+    def __init__(self, config, dataset, mode):
+        super().__init__(config, dataset, mode)
 
     def build_model(self):
         self.images = self.dataset.img_batch
