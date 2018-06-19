@@ -1,0 +1,8 @@
+numpy==1.14.5
+augmentor==0.2.2
+tensorflow==1.8
+tensorboard==1.8
+scipy==1.1
+scikit-image==0.14
+paramiko==2.4.1
+scp==0.11
