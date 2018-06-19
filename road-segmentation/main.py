@@ -3,11 +3,12 @@ import tensorflow as tf
 from core.dataset import Dataset
 from core.training import Training
 from core.evaluation import Evaluation
+import utility.parser as parser
 
 
 # Parse Argument to Load Model and Config
-model_name = str(sys.argv[1])
-mode = str(sys.argv[2])
+model_name = parser.args.model_name
+mode = parser.args.mode
 
 model_module = importlib.import_module('models.' + model_name + ".model")
 Model = model_module.Model
