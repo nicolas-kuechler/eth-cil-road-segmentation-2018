@@ -1,1 +1,4 @@
-augmentor=0.2.2
+numpy==1.14.5
+augmentor==0.2.2
+tensorflow==1.8
+tensorboard==1.8
