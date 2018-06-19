@@ -55,6 +55,7 @@ class Dataset():
                 lambda: self.tf_generator_gt(image_dir=self.config.VALID_PATH_TO_DATA,
                                                 gt_dir=self.config.VALID_PATH_TO_GROUNDTRUTH,
                                                 method_name=self.config.VALID_METHOD_NAME,
+                                                gt_foreground_threshold=self.config.GT_FOREGROUND_THRESHOLD,
                                                 patch_size=self.config.VALID_METHOD_PATCH_SIZE,
                                                 stride=self.config.VALID_METHOD_STRIDE),
                 (self.OUTPUT_TYPE, self.OUTPUT_TYPE))
@@ -73,7 +74,9 @@ class Dataset():
         ds = ds.batch(self.config.TEST_BATCH_SIZE)
         return ds
 
-    def tf_generator_gt(self, image_dir:str, gt_dir:str, method_name:str, patch_size=None, stride=None):
+
+
+    def tf_generator_gt(self, image_dir:str, gt_dir:str, method_name:str, gt_foreground_threshold:float, patch_size=None, stride=None):
         assert method_name in ['patch', 'full']
 
         for filename in os.listdir(image_dir):
@@ -83,6 +86,10 @@ class Dataset():
 
             # reshape gt
             gt = gt.reshape((gt.shape[0], gt.shape[1], 1))
+
+            # process gt such that each pixel is: road=1, background=0
+            gt = gt / 255.0
+            gt = np.where(gt>gt_foreground_threshold, 1, 0)
 
             if(method_name=='patch'):
                 img_patches = isam.split_into_patches(image=img, patch_size=(patch_size,  patch_size, 3), stride=stride)
@@ -116,7 +123,7 @@ class Dataset():
 
     def build_augmentation_pipeline(self, path_to_data: str, path_to_groundtruth:str , seed = None):
         # Create a pipeline
-        p = CustomPipeline(path_to_data)
+        p = CustomPipeline(source_directory=path_to_data, gt_foreground_threshold=self.config.GT_FOREGROUND_THRESHOLD)
         p.ground_truth(path_to_groundtruth)
         p.set_seed(seed) # set seed if provided
 
@@ -191,7 +198,8 @@ class Dataset():
 
 
 class CustomPipeline(Augmentor.Pipeline):
-    def __init__(self, source_directory=None, output_directory='output', save_format=None):
+    def __init__(self, source_directory, gt_foreground_threshold, output_directory='output', save_format=None):
+        self.gt_foreground_threshold = gt_foreground_threshold
         Augmentor.Pipeline.__init__(self, source_directory, output_directory, save_format)
 
     def tf_generator(self):
@@ -205,20 +213,24 @@ class CustomPipeline(Augmentor.Pipeline):
             images = self._tf_execute(self.augmentor_images[random_image_index])
 
             # reshape image
-            img_array = np.asarray(images[0])
-            w = img_array.shape[0]
-            h = img_array.shape[1]
-            c = 1 if np.ndim(img_array) == 2 else img_array.shape[2]
-            img_array = img_array.reshape(w, h, c)
+            img = np.asarray(images[0])
+            w = img.shape[0]
+            h = img.shape[1]
+            c = 1 if np.ndim(img) == 2 else img.shape[2]
+            img = img.reshape(w, h, c)
 
             # reshape groundtruth
-            gt_array = np.asarray(images[1])
-            w = gt_array.shape[0]
-            h = gt_array.shape[1]
-            c = 1 if np.ndim(gt_array) == 2 else gt_array.shape[2]
-            gt_array = gt_array.reshape(w, h, c)
+            gt = np.asarray(images[1])
+            w = gt.shape[0]
+            h = gt.shape[1]
+            c = 1 if np.ndim(gt) == 2 else gt.shape[2]
+            gt = gt.reshape(w, h, c)
 
-            yield (img_array, gt_array)
+            # process gt such that each pixel is: road=1, background=0
+            gt = gt / 255.0
+            gt = np.where(gt>self.gt_foreground_threshold, 1.0, 0.0)
+
+            yield (img, gt)
 
 
     def _tf_execute(self, augmentor_image):

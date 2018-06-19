@@ -108,6 +108,9 @@ class AbstractConfig(ABC):
      /_/ \_\_,_\__, |_|_|_\___|_||_\__\__,_|\__|_\___/_||_|
                |___/
     '''
+
+    GT_FOREGROUND_THRESHOLD = 0.25
+
     # flip (mirror) the image along either its horizontal or vertical axis.
     AUG_FLIP_RANDOM_PROB = 0.3
 
