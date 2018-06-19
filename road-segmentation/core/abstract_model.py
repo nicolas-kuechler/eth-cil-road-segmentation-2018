@@ -76,19 +76,20 @@ class AbstractModel(ABC):
 
     def build_summaries(self):
         with tf.name_scope('summaries'):
-            tf.summary.scalar('loss', self.loss, collections=['train'])
-            tf.summary.scalar('mean_squarred_error', self.mse, collections=['train', 'valid'])
-            tf.summary.scalar('learning_rate', self.lr, collections=['train'])
+            tf.summary.scalar('loss', self.loss, collections=['train_img','train'])
+            tf.summary.scalar('mean_squarred_error', self.mse, collections=['train_img','train', 'valid'])
+            tf.summary.scalar('learning_rate', self.lr, collections=['train_img','train'])
 
             self.rmse_valid_pl = tf.placeholder(tf.float32, name='rmse_valid_pl')
             rmse_valid_s = tf.summary.scalar('rmse_valid_s', self.rmse_valid_pl)
             self.summary_valid_rmse = tf.summary.merge([rmse_valid_s])
 
-            tf.summary.image('image', self.images, max_outputs=self.config.SUMMARY_IMAGE_MAX_OUTPUTS, collections=['train', 'valid', 'test'])
-            tf.summary.image('prediction', self.predictions, max_outputs=self.config.SUMMARY_IMAGE_MAX_OUTPUTS, collections=['train', 'valid', 'test'])
-            tf.summary.image('groundtruth', self.labels, max_outputs=self.config.SUMMARY_IMAGE_MAX_OUTPUTS, collections=['train', 'valid'])
+            tf.summary.image('image', self.images, max_outputs=self.config.SUMMARY_IMAGE_MAX_OUTPUTS, collections=['train_img', 'valid', 'test'])
+            tf.summary.image('prediction', self.predictions, max_outputs=self.config.SUMMARY_IMAGE_MAX_OUTPUTS, collections=['train_img', 'valid', 'test'])
+            tf.summary.image('groundtruth', self.labels, max_outputs=self.config.SUMMARY_IMAGE_MAX_OUTPUTS, collections=['train_img', 'valid'])
 
             self.summary_train = tf.summary.merge(tf.get_collection('train'))
+            self.summary_train_img = tf.summary.merge(tf.get_collection('train_img'))
             self.summary_valid = tf.summary.merge(tf.get_collection('valid'))
             self.summary_test = tf.summary.merge(tf.get_collection('test'))
 

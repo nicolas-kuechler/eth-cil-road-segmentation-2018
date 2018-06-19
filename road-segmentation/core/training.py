@@ -40,6 +40,11 @@ class Training():
                     'loss': self.model.loss,
                     'summary': self.model.summary_train
                 }
+
+                # write images to summary only ever x'th step
+                if step % self.config.SUMMARY_IMAGE_EVERY_STEP == 0:
+                    fetches['summary'] =  self.model.summary_train_img
+
                 train_output = self.sess.run(fetches)
 
                 self.summary_writer_train.add_summary(train_output['summary'], global_step=step)

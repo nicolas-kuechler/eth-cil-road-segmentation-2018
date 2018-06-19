@@ -97,6 +97,7 @@ class AbstractConfig(ABC):
 
     CHECKPOINT_ID = None # if None, the last checkpoint will be used
 
+    SUMMARY_IMAGE_EVERY_STEP = N_BATCHES_PER_EPOCH
     SUMMARY_IMAGE_MAX_OUTPUTS = 3
 
 

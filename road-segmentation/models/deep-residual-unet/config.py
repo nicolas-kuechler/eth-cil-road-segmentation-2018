@@ -22,6 +22,9 @@ class Config(AbstractConfig):
     LEARNING_RATE_DECAY_RATE = 0.1
     LEARNING_RATE_DECAY_STEPS = N_BATCHES_PER_EPOCH * 20 # every 20'th epoch
 
-    # Define new Configurations for your Model
     OPTIMIZER = tf.train.AdamOptimizer
     USE_GRADIENT_CLIPPING = False
+
+    SUMMARY_IMAGE_EVERY_STEP = 100
+
+    # Define new Configurations for your Model
