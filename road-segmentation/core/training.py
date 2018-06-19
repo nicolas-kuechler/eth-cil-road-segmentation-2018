@@ -29,6 +29,12 @@ class Training():
                 step = tf.train.global_step(self.sess, self.model.global_step)
 
                 # train step
+                if self.config.LEARNING_RATE_TYPE == 'linear' and step % self.config.LEARNING_RATE_DECAY_STEPS == 0:
+                    # TODO [nku] remove
+                    print('LR Before: ', sess.run(self.model.lr))
+                    sess.run(self.model.lr_decay_op)
+                    print('LR After: ', sess.run(self.model.lr))
+
                 fetches = {
                     'train_op': self.model.train_op,
                     'loss': self.model.loss,
@@ -78,7 +84,5 @@ class Training():
                 self.model.save(self.sess)
 
             self.sess.run(self.model.epoch_increment_op) # increment epoch counter
-            print('epoch inc: ', self.sess.run(self.model.epoch))
-            print('gobal_step: ', self.sess.run(self.model.global_step))
 
         self.model.save(self.sess) # save the model after training

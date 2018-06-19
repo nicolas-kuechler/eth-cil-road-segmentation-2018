@@ -40,7 +40,7 @@ class AbstractModel(ABC):
 
     def init_global_step_counter(self):
         with tf.variable_scope('global_step'):
-            self.global_step = tf.Variable(0, trainable=False, name='global_step')
+            self.global_step = tf.Variable(1, trainable=False, name='global_step')
 
     def init_epoch_counter(self):
         with tf.variable_scope('epoch'):
@@ -51,6 +51,8 @@ class AbstractModel(ABC):
         var_list = tf.trainable_variables()
         var_list.append(self.global_step)
         var_list.append(self.epoch)
+
+        # TODO [nku] saving and loading of learning rate that makes sense for all types
 
         self.saver = tf.train.Saver(var_list=var_list, max_to_keep=self.config.MAX_CHECKPOINTS_TO_KEEP, save_relative_paths=True)
 
@@ -65,7 +67,7 @@ class AbstractModel(ABC):
             self.lr_decay_op = tf.identity(self.lr)
         elif self.config.LEARNING_RATE_TYPE == 'linear':
             self.lr = tf.Variable(self.config.LEARNING_RATE, trainable=False)
-            self.lr_decay_op = lr.assign(tf.multiply(self.lr, self.config.LEARNING_RATE_DECAY_RATE))
+            self.lr_decay_op = self.lr.assign(tf.multiply(self.lr, self.config.LEARNING_RATE_DECAY_RATE))
         elif self.config.LEARNING_RATE_TYPE == 'fixed':
             self.lr = self.config.LEARNING_RATE
             self.lr_decay_op = tf.identity(self.lr)

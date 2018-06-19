@@ -97,7 +97,7 @@ class AbstractConfig(ABC):
 
     CHECKPOINT_ID = None # if None, the last checkpoint will be used
 
-    SUMMARY_IMAGE_MAX_OUTPUTS = 10
+    SUMMARY_IMAGE_MAX_OUTPUTS = 3
 
 
     '''

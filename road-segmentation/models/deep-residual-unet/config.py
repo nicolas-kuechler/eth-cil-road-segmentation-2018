@@ -13,11 +13,15 @@ class Config(AbstractConfig):
     VALID_METHOD_STRIDE = 200
 
     N_EPOCHS = 30
-    N_BATCHES_PER_EPOCH = 300
-    TRAIN_BATCH_SIZE = 2
+    N_BATCHES_PER_EPOCH = 1000
+    TRAIN_BATCH_SIZE = 8
 
-    LEARNING_RATE = 1.0
+    LEARNING_RATE = 0.001
+
+    LEARNING_RATE_TYPE = 'linear'
+    LEARNING_RATE_DECAY_RATE = 0.1
+    LEARNING_RATE_DECAY_STEPS = N_BATCHES_PER_EPOCH * 20 # every 20'th epoch
 
     # Define new Configurations for your Model
-    OPTIMIZER = tf.train.AdadeltaOptimizer
+    OPTIMIZER = tf.train.AdamOptimizer
     USE_GRADIENT_CLIPPING = False
