@@ -25,6 +25,6 @@ class Config(AbstractConfig):
     OPTIMIZER = tf.train.AdamOptimizer
     USE_GRADIENT_CLIPPING = False
 
-    SUMMARY_IMAGE_EVERY_STEP = 100
+    SUMMARY_IMAGE_EVERY_STEP = 500
 
     # Define new Configurations for your Model

@@ -11,7 +11,7 @@ class Model(AbstractModel):
 
     def build_model(self):
         self.images = self.dataset.img_batch
-        self.labels = self.dataset.labels
+        self.labels = tf.cast(self.dataset.labels, tf.float32)
 
         # Build Neural Network Architecture
         input = tf.cast(self.images, tf.float32)
