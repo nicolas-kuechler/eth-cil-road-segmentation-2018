@@ -1,6 +1,7 @@
 from abc import ABC
 import numpy as np
 import os
+import tensorflow as tf
 
 class AbstractConfig(ABC):
 
@@ -48,6 +49,9 @@ class AbstractConfig(ABC):
     LEARNING_RATE = 1.0
     LEARNING_RATE_DECAY_STEPS = 1000
     LEARNING_RATE_DECAY_RATE = 0.95
+
+    OPTIMIZER = tf.train.AdamOptimizer
+    USE_GRADIENT_CLIPPING = True
 
 
     '''

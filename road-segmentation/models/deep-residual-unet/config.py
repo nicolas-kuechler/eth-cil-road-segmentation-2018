@@ -1,4 +1,5 @@
 from core.abstract_config import AbstractConfig
+import tensorflow as tf
 
 class Config(AbstractConfig):
 
@@ -18,3 +19,5 @@ class Config(AbstractConfig):
     LEARNING_RATE = 1.0
 
     # Define new Configurations for your Model
+    OPTIMIZER = tf.train.AdadeltaOptimizer
+    USE_GRADIENT_CLIPPING = False

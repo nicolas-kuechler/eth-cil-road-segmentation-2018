@@ -4,3 +4,4 @@ tensorflow==1.8
 tensorboard==1.8
 scipy==1.1
 scikit-image==0.14
+paramiko==2.4.1
