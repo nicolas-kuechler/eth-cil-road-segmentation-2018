@@ -1,3 +1,6 @@
+# for the checkpoints and logs
+output/
+
 .idea/*
 
 .ipynb_checkpoints

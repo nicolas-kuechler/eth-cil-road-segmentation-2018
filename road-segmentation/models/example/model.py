@@ -17,4 +17,6 @@ class Model(AbstractModel):
         # Define predictions, train_op, loss
         self.predictions = conv
         self.loss = tf.losses.mean_squared_error(self.labels, self.predictions)
-        self.train_op = tf.train.AdamOptimizer(self.lr).minimize(self.loss, global_step=self.global_step)
+
+        # optimize
+        self.optimize()

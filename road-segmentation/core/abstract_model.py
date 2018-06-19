@@ -94,6 +94,13 @@ class AbstractModel(ABC):
     def build_mse(self):
         self.mse = tf.losses.mean_squared_error(labels=self.labels, predictions=self.predictions)
 
+    def optimize(self):
+        params = tf.trainable_variables()
+        optimizer = tf.train.AdamOptimizer(learning_rate=self.lr)
+        gradients = tf.gradients(self.loss, params)
+        clipped_gradients, _ = tf.clip_by_global_norm(gradients, 5.0)
+        self.train_op = optimizer.apply_gradients(zip(clipped_gradients, params), global_step=self.global_step)
+
     def save(self, sess):
         print("Saving model...")
         self.saver.save(sess, self.config.CHECKPOINT_DIR, self.global_step)

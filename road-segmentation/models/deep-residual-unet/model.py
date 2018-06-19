@@ -28,7 +28,7 @@ class Model(AbstractModel):
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
-            self.train_op = tf.train.AdadeltaOptimizer(learning_rate=self.lr).minimize(self.loss, global_step=self.global_step)
+            self.optimize()
 
 
     def encoder(self, input):
