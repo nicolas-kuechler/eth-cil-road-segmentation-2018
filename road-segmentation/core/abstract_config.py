@@ -80,8 +80,8 @@ class AbstractConfig(ABC):
     TEST_BATCH_SIZE = 20
 
     TEST_METHOD_NAME = 'patch'     # patch or full
-    TEST_METHOD_PATCH_SIZE = 120   # only for patch
-    TEST_METHOD_STRIDE = 61        # only for patch
+    TEST_METHOD_PATCH_SIZE = 200   # only for patch
+    TEST_METHOD_STRIDE = 136        # only for patch
 
     TEST_N_PATCHES_PER_IMAGE = (TEST_IMAGE_SIZE - TEST_METHOD_PATCH_SIZE)/ TEST_METHOD_STRIDE + 1
 

@@ -22,9 +22,13 @@ class Evaluation():
         predictions = []
         labels =  []
 
+        count = 0
+
         # loop through test dataset and get predictions
         while(True):
             try:
+                print('Iter: ', count)
+                count += 1
                 fetches = {
                     'predictions': self.model.predictions,
                     'labels': self.model.labels
