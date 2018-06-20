@@ -30,10 +30,11 @@ class Training():
 
                 # train step
                 if self.config.LEARNING_RATE_TYPE == 'linear' and step % self.config.LEARNING_RATE_DECAY_STEPS == 0:
-                    # TODO [nku] remove
-                    print('LR Before: ', sess.run(self.model.lr))
-                    sess.run(self.model.lr_decay_op)
-                    print('LR After: ', sess.run(self.model.lr))
+                    old_lr = self.sess.run(self.model.lr)
+                    self.sess.run(self.model.lr_decay_op)
+                    new_lr = self.sess.run(self.model.lr)
+                    if old_lr is not new_lr:
+                        print('Changed learning rate from {} to {}.'.format(old_lr, new_lr))
 
                 fetches = {
                     'train_op': self.model.train_op,
