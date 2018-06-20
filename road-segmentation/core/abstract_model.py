@@ -53,8 +53,7 @@ class AbstractModel(ABC):
         var_list.append(self.epoch)
 
         # TODO [nku] saving and loading of learning rate that makes sense for all types
-
-        self.saver = tf.train.Saver(var_list=var_list, max_to_keep=self.config.MAX_CHECKPOINTS_TO_KEEP, save_relative_paths=True)
+        self.saver = tf.train.Saver(max_to_keep=self.config.MAX_CHECKPOINTS_TO_KEEP)
 
     def init_learning_rate(self):
         # configure learning rate
@@ -110,7 +109,7 @@ class AbstractModel(ABC):
 
     def save(self, sess):
         print("Saving model...")
-        self.saver.save(sess, self.config.CHECKPOINT_DIR, self.global_step)
+        self.saver.save(sess, self.config.CHECKPOINT_DIR + self.config.MODEL_NAME, self.global_step)
         print("Model saved")
 
     def load(self, sess):

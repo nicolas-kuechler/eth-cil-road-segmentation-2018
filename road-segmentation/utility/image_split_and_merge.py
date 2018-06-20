@@ -37,7 +37,7 @@ def merge_into_image(patches: np.ndarray, image_size: Tuple[int, int, int], stri
 
     # calc average for overlapping areas
     avg_image = image/mask
-    return avg_image.astype('uint8')
+    return avg_image
 
 
 def flatten_patches(patches: np.ndarray, id: str):
@@ -82,15 +82,8 @@ def merge_into_image_from_flatten(patches_flatten: np.ndarray, index: np.ndarray
 
     assert(not np.isnan(check).any()), "missing patches"
 
-
-
     # calc average for overlapping areas
     avg_image = image/mask
-
-    print('patches_flatten: \n' , patches_flatten[0,:,:,0])
-    print('mask: \n', mask)
-    print('image: \n', image)
-    print('avg_image: \n', avg_image)
 
     return avg_image
 
