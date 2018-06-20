@@ -61,7 +61,10 @@ class Evaluation():
                                                 stride=self.config.TEST_METHOD_STRIDE)
                 img_id = labels[start, 0]
 
-                img = Image.fromarray(img[:,:,0])
+                # scale back
+                img = img * 255
+
+                img = Image.fromarray(img[:,:,0].astype('uint8'))
                 img.save(self.config.TEST_OUTPUT_DIR + 'out{}.png'.format(img_id))
 
         elif self.config.TEST_METHOD_NAME == 'full':
