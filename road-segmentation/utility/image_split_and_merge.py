@@ -87,6 +87,7 @@ def merge_into_image_from_flatten(patches_flatten: np.ndarray, index: np.ndarray
     # calc average for overlapping areas
     avg_image = image/mask
 
+    print('patches_flatten: \n' , patches_flatten[0,:,:,0])
     print('mask: \n', mask)
     print('image: \n', image)
     print('avg_image: \n', avg_image)
