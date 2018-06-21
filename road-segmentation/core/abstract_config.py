@@ -99,6 +99,7 @@ class AbstractConfig(ABC):
 
     SUMMARY_IMAGE_EVERY_STEP = N_BATCHES_PER_EPOCH
     SUMMARY_IMAGE_MAX_OUTPUTS = 3
+    SUMMARY_FULL_IMAGE_MAX_OUTPUTS = 10 # number of images per batch in validation and test (with method 'full' -> 10 means show all validation images)
 
 
     '''

@@ -54,8 +54,8 @@ class Training():
             # Validation
             print('Start Validation...')
             self.sess.run(self.model.dataset.init_op_valid) # switch to validation dataset
-            mse_sum = 0
-            count = 0
+
+            mses = []
             while True:
                 # validation step
                 try:
@@ -66,19 +66,18 @@ class Training():
 
                     fetches = {
                         'mse': self.model.mse,
-                        #'summary': self.model.summary_valid
+                        'summary': self.model.summary_valid
                     }
                     valid_output = self.sess.run(fetches)
 
-                    #self.summary_writer_valid.add_summary(valid_output['summary'], global_step=step)
+                    self.summary_writer_valid.add_summary(valid_output['summary'], global_step=step)
+                    mses.append(valid_output['mse'])
 
-                    mse_sum += valid_output['mse']
-                    count += 1
                 except tf.errors.OutOfRangeError:
                     break # end of dataset
 
             # Calculate Root Mean Squared Error and Write to Summary
-            rmse = np.sqrt(mse_sum / float(count))
+            rmse = np.sqrt(sum(mses) / float(len(mses)))
             rmse_valid = self.sess.run(self.model.summary_valid_rmse, {self.model.rmse_valid_pl: rmse})
             self.summary_writer_valid.add_summary(rmse_valid, global_step=step)
 
