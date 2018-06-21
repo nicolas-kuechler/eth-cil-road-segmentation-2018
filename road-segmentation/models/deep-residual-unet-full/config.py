@@ -8,8 +8,8 @@ class Config(AbstractConfig):
 
     # Overwrite any Configurations from Abstract Config
     N_EPOCHS = 50
-    N_BATCHES_PER_EPOCH = 1000
-    TRAIN_BATCH_SIZE = 8
+    N_BATCHES_PER_EPOCH = 500
+    TRAIN_BATCH_SIZE = 4
 
     LEARNING_RATE = 0.001
 
@@ -24,6 +24,9 @@ class Config(AbstractConfig):
 
     VALID_METHOD_NAME = 'full'
     TRAIN_METHOD_NAME = 'full'
+    TEST_METHOD_NAME = 'full'
+
+    TEST_BATCH_SIZE = 4
 
     AUG_FLIP_RANDOM_PROB = 0.000000000000001
     AUG_ZOOM_RANDOM_PERCENTAGE_AREA = 0.95
