@@ -13,9 +13,31 @@ class Model(AbstractModel):
 
         # Build Neural Network Architecture (here single convolution layer)
         input = tf.cast(self.images, tf.float32)
-        conv = tf.layers.conv2d(inputs=input, filters=1, kernel_size=[3, 3], padding='same')
-        conv_bn = tf.layers.batch_normalization(conv, training=self.is_training)
-        output = tf.nn.sigmoid(conv_bn)
+
+        with tf.variable_scope('encoding'):
+            conv = tf.layers.conv2d(inputs=input, filters=32, kernel_size=7, padding='same',
+                                    activation=tf.nn.leaky_relu)
+            conv = tf.layers.conv2d(inputs=conv, filters=64, kernel_size=3, padding='same',
+                                    activation=tf.nn.leaky_relu)
+            conv = tf.layers.max_pooling2d(inputs=conv, pool_size=2, strides=2, padding='same')
+            conv = tf.layers.conv2d(inputs=conv, filters=32, kernel_size=3, padding='same',
+                                    activation=tf.nn.leaky_relu)
+            conv = tf.layers.max_pooling2d(inputs=conv, pool_size=2, strides=2, padding='same')
+
+            conv = tf.layers.conv2d(inputs=conv, filters=256, kernel_size=3, strides=1, padding='same',
+                                    activation=tf.nn.leaky_relu)
+            conv = tf.layers.max_pooling2d(inputs=conv, pool_size=2, strides=2, padding='same')
+
+        with tf.variable_scope('decoding'):
+            conv = tf.layers.conv2d(inputs=conv, filters=256, kernel_size=3, padding='same',
+                                    activation=tf.nn.leaky_relu)
+            conv = tf.layers.conv2d_transpose(conv, filters=128, kernel_size=3, padding='same', strides=2)
+            conv = tf.layers.conv2d_transpose(conv, filters=64, kernel_size=3, padding='same', strides=2)
+            conv = tf.layers.conv2d_transpose(conv, filters=64, kernel_size=3, padding='same', strides=2)
+            conv = tf.layers.conv2d(conv, filters=32, kernel_size=3, strides=1, padding='same')
+            conv = tf.layers.conv2d(conv, filters=1, kernel_size=3, strides=1, padding='same')
+
+        output = tf.nn.sigmoid(conv)
 
         # Define predictions, train_op, loss
         self.predictions = output
