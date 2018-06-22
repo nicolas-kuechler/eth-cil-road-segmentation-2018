@@ -27,4 +27,7 @@ class Config(AbstractConfig):
 
     SUMMARY_IMAGE_EVERY_STEP = 500
 
+    AUG_FLIP_RANDOM_PROB = 0.000000000000001
+    AUG_ZOOM_RANDOM_PERCENTAGE_AREA = 0.95
+
     # Define new Configurations for your Model
