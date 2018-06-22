@@ -23,7 +23,8 @@ class Training():
             print('Start Epoch: ', epoch)
 
             # Training
-            self.sess.run(self.model.dataset.init_op_train) # switch to training dataset
+            train_init = tf.group(self.model.dataset.init_op_train, self.model.precision_running_vars_initializer, self.model.recall_running_vars_initializer)
+            self.sess.run(train_init) # switch to training dataset and reset the accuracy/precision/recall vars
 
             for i in tqdm(range(self.config.N_BATCHES_PER_EPOCH)):
                 step = tf.train.global_step(self.sess, self.model.global_step)
@@ -39,6 +40,8 @@ class Training():
                 fetches = {
                     'train_op': self.model.train_op,
                     'loss': self.model.loss,
+                    'precision_update': self.model.precision_update,
+                    'recall_update': self.model.recall_update,
                     'summary': self.model.summary_train
                 }
 
@@ -50,10 +53,14 @@ class Training():
 
                 self.summary_writer_train.add_summary(train_output['summary'], global_step=step)
 
+            train_end_summary = self.sess.run(self.model.summary_train_end)
+            self.summary_writer_train.add_summary(train_end_summary, global_step=step)
+
 
             # Validation
             print('Start Validation...')
-            self.sess.run(self.model.dataset.init_op_valid) # switch to validation dataset
+            valid_init = tf.group(self.model.dataset.init_op_valid, self.model.precision_running_vars_initializer, self.model.recall_running_vars_initializer)
+            self.sess.run(valid_init) # switch to validation dataset and init running vars valid
 
             mses = []
             while True:
@@ -66,6 +73,8 @@ class Training():
 
                     fetches = {
                         'mse': self.model.mse,
+                        'precision_update': self.model.precision_update,
+                        'recall_update': self.model.recall_update,
                         'summary': self.model.summary_valid
                     }
                     valid_output = self.sess.run(fetches)
@@ -78,8 +87,9 @@ class Training():
 
             # Calculate Root Mean Squared Error and Write to Summary
             rmse = np.sqrt(sum(mses) / float(len(mses)))
-            rmse_valid = self.sess.run(self.model.summary_valid_rmse, {self.model.rmse_valid_pl: rmse})
-            self.summary_writer_valid.add_summary(rmse_valid, global_step=step)
+
+            valid_end_summary = self.sess.run(self.model.summary_valid_end, {self.model.rmse_valid_pl: rmse})
+            self.summary_writer_valid.add_summary(valid_end_summary, global_step=step)
 
             print('RMSE: ', rmse)
             print('Validation Finished')
