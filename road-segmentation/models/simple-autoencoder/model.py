@@ -24,12 +24,23 @@ class Model(AbstractModel):
             input = self.fire_module(input, layer_number)
 
         # inverted fire modules
-        for layer_number in range(self.config.N_fire_modules):
-            input = self.inverse_fire_module(input, layer_number)
+        #for layer_number in range(self.config.N_fire_modules):
+        #    input = self.inverse_fire_module(input, layer_number)
+
+        with tf.variable_scope('decoding'):
+            conv = tf.layers.conv2d(inputs=input, filters=256, kernel_size=3, padding='same',
+                                    activation=tf.nn.leaky_relu)
+            conv = tf.layers.conv2d_transpose(conv, filters=192, kernel_size=3, padding='same', strides=2)
+            conv = tf.layers.conv2d_transpose(conv, filters=128, kernel_size=3, padding='same', strides=2)
+            conv = tf.layers.conv2d_transpose(conv, filters=64, kernel_size=3, padding='same', strides=2)
+            conv = tf.layers.conv2d_transpose(conv, filters=64, kernel_size=3, padding='same', strides=2)
+            conv = tf.layers.conv2d(conv, filters=32, kernel_size=3, strides=1, padding='same')
+            conv = tf.layers.conv2d(conv, filters=16, kernel_size=3, strides=1, padding='same')
+            conv = tf.layers.conv2d(conv, filters=1, kernel_size=3, strides=1, padding='same')
+            conv = tf.layers.conv2d(conv, filters=1, kernel_size=1, strides=1, padding='same')
 
         # final conv layer
-        self.predictions = tf.layers.conv2d_transpose(inputs=input, filters=1, kernel_size=7, strides=2,
-                                 padding='same', name='final_conv', activation=tf.sigmoid)
+        self.predictions = tf.nn.sigmoid(conv)
 
         # Define predictions, train_op, loss
         self.loss = tf.losses.mean_squared_error(self.labels, self.predictions)
@@ -47,12 +58,12 @@ class Model(AbstractModel):
         with tf.variable_scope('fire_module' + str(layer_number)):
             with tf.name_scope(name='squeeze'):
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_SQUEEZE1[layer_number],
-                                         kernel_size=1, strides=1, activation=tf.nn.relu, padding='same')
+                                         kernel_size=1, strides=1, activation=tf.nn.leaky_relu, padding='same')
             with tf.name_scope(name='expand'):
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND1[layer_number],
-                                         kernel_size=1, strides=1, padding='same', activation=tf.nn.relu)
+                                         kernel_size=1, strides=1, padding='same', activation=tf.nn.leaky_relu)
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND3[layer_number],
-                                         kernel_size=3, strides=1, padding='same', activation=tf.nn.relu)
+                                         kernel_size=3, strides=1, padding='same', activation=tf.nn.leaky_relu)
 
         if self.config.DROPOUTS[layer_number]:
             with tf.name_scope(name='dropout' + str(layer_number)):
