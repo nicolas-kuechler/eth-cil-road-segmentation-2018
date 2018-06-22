@@ -8,11 +8,11 @@ class Config(AbstractConfig):
 
     # Overwrite any Configurations from Abstract Config
     N_EPOCHS = 100
-    N_BATCHES_PER_EPOCH = 2
+    N_BATCHES_PER_EPOCH = 4
     LEARNING_RATE = 0.0007
     TRAIN_METHOD_NAME = 'full' # patch or full
     VALID_METHOD_NAME = 'full'
-    SUMMARY_IMAGE_EVERY_STEP = 1
+    SUMMARY_IMAGE_EVERY_STEP = 3
 
     # Define new Configurations for your Model
 

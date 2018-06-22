@@ -10,7 +10,7 @@ class Model(AbstractModel):
     def build_model(self):
         self.check_configs()
         self.images = self.dataset.img_batch
-        self.labels = self.dataset.labels
+        self.labels = tf.cast(self.dataset.labels, tf.float32)
 
         # Build Neural Network Architecture (here single convolution layer)
         input = tf.cast(self.images, tf.float32)
@@ -29,29 +29,30 @@ class Model(AbstractModel):
 
         # final conv layer
         self.predictions = tf.layers.conv2d_transpose(inputs=input, filters=1, kernel_size=7, strides=2,
-                                 padding='same', name='final_conv', activation=tf.nn.relu)
+                                 padding='same', name='final_conv', activation=tf.sigmoid)
 
         # Define predictions, train_op, loss
         self.loss = tf.losses.mean_squared_error(self.labels, self.predictions)
 
         # optimize
-        self.optimize()
+        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        with tf.control_dependencies(update_ops):
+            self.optimize()
 
     def fire_module(self, input, layer_number):
         if self.config.MAX_POOLS[layer_number]:
-            with tf.name_scope(name='maxpool' + str(layer_number)):
+            with tf.variable_scope('maxpool' + str(layer_number)):
                 input = tf.layers.max_pooling2d(inputs=input, pool_size=3, strides=2, padding='same')
 
-        with tf.name_scope(name='fire_module' + str(layer_number)):
+        with tf.variable_scope('fire_module' + str(layer_number)):
             with tf.name_scope(name='squeeze'):
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_SQUEEZE1[layer_number],
                                          kernel_size=1, strides=1, activation=tf.nn.relu, padding='same')
             with tf.name_scope(name='expand'):
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND1[layer_number],
-                                         kernel_size=1, strides=1, padding='same')
+                                         kernel_size=1, strides=1, padding='same', activation=tf.nn.relu)
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND3[layer_number],
-                                         kernel_size=3, strides=1, padding='same')
-                input = tf.nn.relu(input)
+                                         kernel_size=3, strides=1, padding='same', activation=tf.nn.relu)
 
         if self.config.DROPOUTS[layer_number]:
             with tf.name_scope(name='dropout' + str(layer_number)):
@@ -60,19 +61,18 @@ class Model(AbstractModel):
         return input
 
     def inverse_fire_module(self, input, layer_number):
-        with tf.name_scope(name='inverse_fire_module' + str(layer_number)):
+        with tf.variable_scope('inverse_fire_module' + str(layer_number)):
             with tf.name_scope(name='expand'):
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND3[-layer_number-1],
-                                         kernel_size=3, strides=1, padding='same')
+                                         kernel_size=3, strides=1, padding='same', activation=tf.nn.relu)
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND1[-layer_number-1],
-                                         kernel_size=1, strides=1, padding='same')
-                input = tf.nn.relu(input)
+                                         kernel_size=1, strides=1, padding='same', activation=tf.nn.relu)
             with tf.name_scope(name='squeeze'):
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_SQUEEZE1[-layer_number-1],
                                          kernel_size=1, strides=1, activation=tf.nn.relu, padding='same')
 
         if self.config.MAX_POOLS[-layer_number-1]:
-            with tf.name_scope(name='maxpool' + str(layer_number)):
+            with tf.variable_scope('upsampling' + str(layer_number)):
                 input = tf.layers.conv2d_transpose(inputs=input, filters=self.config.FILTERS_SQUEEZE1[-layer_number-1],
                                                    kernel_size=3, strides=2, padding='same')
         return input
