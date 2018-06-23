@@ -5,6 +5,7 @@ from core.abstract_model import AbstractModel
 class Model(AbstractModel):
 
     def __init__(self, config, dataset, mode):
+        self.is_training = mode == 'train'
         super().__init__(config, dataset, mode)
 
     def build_model(self):
