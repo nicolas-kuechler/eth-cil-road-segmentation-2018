@@ -67,7 +67,7 @@ class Model(AbstractModel):
             with tf.name_scope(name='expand'):
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND3[-layer_number-1],
                                          kernel_size=3, strides=1, padding='same', activation=tf.nn.relu)
-                input = connections[layer_number] + input
+                input = connections[-layer_number-1] + input
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND1[-layer_number-1],
                                          kernel_size=1, strides=1, padding='same', activation=tf.nn.relu)
             with tf.name_scope(name='squeeze'):
