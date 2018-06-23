@@ -29,11 +29,11 @@ class Model(AbstractModel):
             # inverted fire modules
             for layer_number in range(self.config.N_fire_modules):
                 input = self.inverse_fire_module(input, layer_number, connections)
-            hourglass_conn = input
 
-        input = tf.layers.conv2d_transpose(input, filters=1, kernel_size=7, strides=2, name='middle_conv',
-                                           padding='same', activation=tf.nn.leaky_relu)
-        input = tf.layers.conv2d(input, filters=96, kernel_size=7, strides=1, padding='same')
+        input = tf.layers.conv2d(input, filters=1, kernel_size=7, strides=1, padding='same')
+        input = tf.layers.conv2d(input, filters=1, kernel_size=7, strides=1, padding='same',
+                                 activation=tf.sigmoid)
+        hourglass_conn = input
 
         with tf.variable_scope('hourglass_2'):
             connections = []
@@ -43,10 +43,9 @@ class Model(AbstractModel):
             # inverted fire modules
             for layer_number in range(self.config.N_fire_modules):
                 input = self.inverse_fire_module(input, layer_number, connections)
-            input = hourglass_conn + input
 
+        input = hourglass_conn + input
         # final conv layer
-
         input = tf.layers.conv2d_transpose(inputs=input, filters=1, kernel_size=7, strides=2,
                                            padding='same', activation=tf.nn.leaky_relu)
         self.predictions = tf.layers.conv2d(inputs=input, filters=1, kernel_size=3, strides=1,
