@@ -20,8 +20,9 @@ class Model(AbstractModel):
                                  padding='same', name='conv1')
 
         # fire modules
+        connections = []
         for layer_number in range(self.config.N_fire_modules):
-            input, connections = self.fire_module(input, layer_number)
+            input, connections = self.fire_module(input, layer_number, connections)
 
         # inverted fire modules
         for layer_number in range(self.config.N_fire_modules):
@@ -39,8 +40,7 @@ class Model(AbstractModel):
         with tf.control_dependencies(update_ops):
             self.optimize()
 
-    def fire_module(self, input, layer_number):
-        connections = []
+    def fire_module(self, input, layer_number, connections):
         if self.config.MAX_POOLS[layer_number]:
             with tf.variable_scope('maxpool' + str(layer_number)):
                 input = tf.layers.max_pooling2d(inputs=input, pool_size=3, strides=2, padding='same')
