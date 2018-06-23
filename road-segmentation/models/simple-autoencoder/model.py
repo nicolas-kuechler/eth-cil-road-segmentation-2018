@@ -21,11 +21,11 @@ class Model(AbstractModel):
 
         # fire modules
         for layer_number in range(self.config.N_fire_modules):
-            input = self.fire_module(input, layer_number)
+            input, connections = self.fire_module(input, layer_number)
 
         # inverted fire modules
         for layer_number in range(self.config.N_fire_modules):
-            input = self.inverse_fire_module(input, layer_number)
+            input = self.inverse_fire_module(input, layer_number, connections)
 
         # final conv layer
         self.predictions = tf.layers.conv2d_transpose(inputs=input, filters=1, kernel_size=7, strides=2,
@@ -40,6 +40,7 @@ class Model(AbstractModel):
             self.optimize()
 
     def fire_module(self, input, layer_number):
+        connections = []
         if self.config.MAX_POOLS[layer_number]:
             with tf.variable_scope('maxpool' + str(layer_number)):
                 input = tf.layers.max_pooling2d(inputs=input, pool_size=3, strides=2, padding='same')
@@ -53,18 +54,20 @@ class Model(AbstractModel):
                                          kernel_size=1, strides=1, padding='same', activation=tf.nn.leaky_relu)
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND3[layer_number],
                                          kernel_size=3, strides=1, padding='same', activation=tf.nn.leaky_relu)
+                connections.append(input)
 
         if self.config.DROPOUTS[layer_number]:
             with tf.name_scope(name='dropout' + str(layer_number)):
                 input = tf.nn.dropout(input, keep_prob=0.5)
 
-        return input
+        return input, connections
 
-    def inverse_fire_module(self, input, layer_number):
+    def inverse_fire_module(self, input, layer_number, connections):
         with tf.variable_scope('inverse_fire_module' + str(layer_number)):
             with tf.name_scope(name='expand'):
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND3[-layer_number-1],
                                          kernel_size=3, strides=1, padding='same', activation=tf.nn.relu)
+                input = connections[layer_number] + input
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND1[-layer_number-1],
                                          kernel_size=1, strides=1, padding='same', activation=tf.nn.relu)
             with tf.name_scope(name='squeeze'):
