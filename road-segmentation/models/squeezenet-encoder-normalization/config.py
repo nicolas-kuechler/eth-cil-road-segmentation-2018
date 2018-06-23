@@ -12,6 +12,7 @@ class Config(AbstractConfig):
     LEARNING_RATE = 0.0001
     TRAIN_METHOD_NAME = 'full' # patch or full
     VALID_METHOD_NAME = 'full'
+    TEST_METHOD_NAME = 'full'
     SUMMARY_IMAGE_EVERY_STEP = 400
     TRAIN_BATCH_SIZE = 32
     SUMMARY_IMAGE_MAX_OUTPUTS = 3
