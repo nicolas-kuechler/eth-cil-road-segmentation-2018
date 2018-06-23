@@ -12,7 +12,7 @@ class Config(AbstractConfig):
     LEARNING_RATE = 0.0007
     TRAIN_METHOD_NAME = 'full' # patch or full
     VALID_METHOD_NAME = 'full'
-    SUMMARY_IMAGE_EVERY_STEP = 3
+    SUMMARY_IMAGE_EVERY_STEP = 10
 
     # Define new Configurations for your Model
 
