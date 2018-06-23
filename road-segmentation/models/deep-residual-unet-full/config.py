@@ -7,17 +7,9 @@ class Config(AbstractConfig):
         super().__init__(model_name)
 
     # Overwrite any Configurations from Abstract Config
-    TRAIN_METHOD_PATCH_SIZE_PERCENTAGE = 0.5
-
-    VALID_METHOD_PATCH_SIZE = 200
-    VALID_METHOD_STRIDE = 100
-
-    TEST_METHOD_PATCH_SIZE = 304   # only for patch
-    TEST_METHOD_STRIDE = 152       # only for patch
-
     N_EPOCHS = 50
     N_BATCHES_PER_EPOCH = 500
-    TRAIN_BATCH_SIZE = 8
+    TRAIN_BATCH_SIZE = 4
 
     LEARNING_RATE = 0.001
 
@@ -30,14 +22,13 @@ class Config(AbstractConfig):
 
     SUMMARY_IMAGE_EVERY_STEP = 500
 
-    AUG_SHEAR_PROB = 0.0000001
-    AUG_ROTATE_RANDOM_90_PROB = 0.66
-    AUG_ROTATE_PROB = 0.5
-    AUG_ROTATE_MAX_LEFT_ROTATION = 25
-    AUG_ROTATE_MAX_RIGHT_ROTATION = 25
-    AUG_ZOOM_RANDOM_PROB = 0.2
+    VALID_METHOD_NAME = 'full'
+    TRAIN_METHOD_NAME = 'full'
+    TEST_METHOD_NAME = 'full'
 
-    AUG_COLOR_PCA_PROB = 0.5
-    AUG_COLOR_PCA_SIGMA = 0.25
+    TEST_BATCH_SIZE = 4
+
+    AUG_FLIP_RANDOM_PROB = 0.000000000000001
+    AUG_ZOOM_RANDOM_PERCENTAGE_AREA = 0.95
 
     # Define new Configurations for your Model

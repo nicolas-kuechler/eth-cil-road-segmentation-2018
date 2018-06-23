@@ -115,7 +115,7 @@ class Dataset():
                 img_patches = isam.split_into_patches(image=img, patch_size=(patch_size, patch_size, 3), stride=stride)
                 img_patches_flatten, ids = isam.flatten_patches(img_patches, id)
 
-                for img_patch, id in zip(img_patches_flatten, ids): 
+                for img_patch, id in zip(img_patches_flatten, ids):
                     yield(img_patch, id)
             else:
                 yield(img, id)
@@ -175,6 +175,15 @@ class Dataset():
                                     mu=self.config.AUG_COLOR_PCA_MU,
                                     sigma=self.config.AUG_COLOR_PCA_SIGMA)
         p.add_operation(color_pca)
+
+
+        # STREET BRIGHTNESS AUGMENTATION
+        # TODO [nku] move params to parameter file
+        street_brightness = StreetBrightnessAugmentation(probability=0.3, min_brightness_change = -5, max_brightness_change = 20, fg_threshold = 60)
+        p.add_operation(street_brightness)
+
+
+
 
         # NOISE AUGMENTATION
         # performs a random, elastic gaussian distortion on an image.
@@ -281,3 +290,33 @@ class ColorPCA(Augmentor.Operations.Operation):
 
         # Return the image so that it can further processed in the pipeline:
         return augmented_images
+
+class StreetBrightnessAugmentation(Augmentor.Operations.Operation):
+
+    def __init__(self, probability, min_brightness_change: int, max_brightness_change: int, fg_threshold: int):
+        Augmentor.Operations.Operation.__init__(self, probability)
+
+        self.min_brightness_change = min_brightness_change
+        self.max_brightness_change = max_brightness_change
+        self.fg_threshold = fg_threshold
+
+
+    def perform_operation(self, images):
+
+        assert(len(images)==2), 'needs gt'
+
+        img = np.copy(np.asarray(images[0])).astype('int16')
+        gt = np.asarray(images[1])
+
+        mask = np.where(gt>self.fg_threshold, 1, 0)
+
+        brightness = random.randint(self.min_brightness_change, self.max_brightness_change)
+
+        img[mask==1] += np.array([brightness]).astype(img.dtype)
+
+        img[img>255] = 255
+        img[img<0] = 0
+
+        images[0] = Image.fromarray(img.astype('uint8'))
+
+        return images
