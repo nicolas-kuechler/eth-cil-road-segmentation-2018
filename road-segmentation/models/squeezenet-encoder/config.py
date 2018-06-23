@@ -13,10 +13,10 @@ class Config(AbstractConfig):
     TRAIN_METHOD_NAME = 'full' # patch or full
     VALID_METHOD_NAME = 'full'
     TEST_METHOD_NAME = 'full'
-    SUMMARY_IMAGE_EVERY_STEP = 400
+    SUMMARY_IMAGE_EVERY_STEP = 1000
     TRAIN_BATCH_SIZE = 32
-    SUMMARY_IMAGE_MAX_OUTPUTS = 3
-    SUMMARY_FULL_IMAGE_MAX_OUTPUTS = 3
+    SUMMARY_IMAGE_MAX_OUTPUTS = 5
+    SUMMARY_FULL_IMAGE_MAX_OUTPUTS = 5
 
     # Define new Configurations for your Model
 
