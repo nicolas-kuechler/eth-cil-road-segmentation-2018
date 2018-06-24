@@ -4,7 +4,6 @@ import Augmentor, random, os, re
 from PIL import Image
 from PIL import ImageFilter
 from utility import image_split_and_merge as isam
-from skimage.filters import gaussian_filter
 
 class Dataset():
 
@@ -331,11 +330,8 @@ class GaussianBlur(Augmentor.Operations.Operation):
 
             img_array = np.asarray(image)
             shape = img_array.shape
-            if(len(shape) == 3 and shape[2] == self.evals.shape[0]):
-                image = image.filter(ImageFilter.GaussianBlur(np.random.uniform(self.min_sigma, self.max_sigma)))
-                augmented_images.append(image)
-            else:
-                augmented_images.append(image) # skip groundtruth images
+            image = image.filter(ImageFilter.GaussianBlur(np.random.uniform(self.min_sigma, self.max_sigma)))
+            augmented_images.append(image)
 
         # Return the image so that it can further processed in the pipeline:
         return augmented_images
