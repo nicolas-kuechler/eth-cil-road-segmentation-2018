@@ -76,17 +76,29 @@ class Evaluation():
                 img = Image.fromarray(img[:,:,0].astype('uint8'))
                 img.save(self.config.TEST_OUTPUT_DIR + 'out{}.png'.format(img_id))
 
+                img = img.convert('RGBA')
+                img_test = img_test.convert('RGBA')
+                overlay = Image.blend(img_test, img, 0.5)
+                overlay.save(self.config.TEST_OUTPUT_DIR + f'blended{img_id}.png')
+
         elif self.config.TEST_METHOD_NAME == 'full':
             n_images = predictions.shape[0]
 
             for i in range(n_images):
                 img = predictions[i, :, :, 0]
-                img_id = int(labels[i])
+                img_id = int(ids[i])
                 self.append_prediction(submission_file, img, img_id)
                 img = img * 255
                 img = Image.fromarray(img.astype('uint8'))
-                img_id = int(ids[i])
+                img_test = Image.open(self.config.TEST_PATH_TO_DATA + f'/test_{img_id}.png')
+
                 img.save(self.config.TEST_OUTPUT_DIR + 'out{}.png'.format(img_id))
+
+                img = img.convert('RGBA')
+                img_test = img_test.convert('RGBA')
+                overlay = Image.blend(img_test, img, 0.5)
+                overlay.save(self.config.TEST_OUTPUT_DIR + f'blended_{img_id}.png')
+
         else:
             raise ValueError('Unknown Test Method Name')
 
