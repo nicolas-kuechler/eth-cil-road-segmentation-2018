@@ -19,8 +19,9 @@ class Dataset():
         self.pre_process()
 
         # create iterator
-        iter = tf.data.Iterator.from_structure(output_types=(self.OUTPUT_TYPE, self.OUTPUT_TYPE), output_shapes=([None, None, None, 3],[None, None, None, 1])) #TODO [nku] for training set consider that id's look different maybe?
-        self.img_batch, self.labels = iter.get_next()
+
+        iter = tf.data.Iterator.from_structure(output_types=(self.OUTPUT_TYPE, self.OUTPUT_TYPE, self.OUTPUT_TYPE), output_shapes=([None, None, None, 3],[None, None, None, 1], [None, None, None, 1]))
+        self.img_batch, self.labels, self.id_batch = iter.get_next()
 
         # create initialization operations
         self.init_op_train = iter.make_initializer(self.ds_train)
@@ -46,79 +47,66 @@ class Dataset():
 
         ds = tf.data.Dataset.from_generator(
                 lambda: p.tf_generator(),
-                (self.OUTPUT_TYPE, self.OUTPUT_TYPE))
+                (self.OUTPUT_TYPE, self.OUTPUT_TYPE, self.OUTPUT_TYPE))
         ds = ds.batch(self.config.TRAIN_BATCH_SIZE)
         return ds
 
     def build_ds_valid(self):
         ds = tf.data.Dataset.from_generator(
-                lambda: self.tf_generator_gt(image_dir=self.config.VALID_PATH_TO_DATA,
-                                                gt_dir=self.config.VALID_PATH_TO_GROUNDTRUTH,
-                                                method_name=self.config.VALID_METHOD_NAME,
-                                                gt_foreground_threshold=self.config.GT_FOREGROUND_THRESHOLD,
-                                                patch_size=self.config.VALID_METHOD_PATCH_SIZE,
-                                                stride=self.config.VALID_METHOD_STRIDE),
-                (self.OUTPUT_TYPE, self.OUTPUT_TYPE))
+                lambda: self.tf_generator(image_dir=self.config.VALID_PATH_TO_DATA,
+                                            method_name=self.config.VALID_METHOD_NAME,
+                                            patch_size=self.config.VALID_METHOD_PATCH_SIZE,
+                                            stride=self.config.VALID_METHOD_STRIDE,
+                                            gt_dir=self.config.VALID_PATH_TO_GROUNDTRUTH,
+                                            gt_foreground_threshold=self.config.GT_FOREGROUND_THRESHOLD),
+                (self.OUTPUT_TYPE, self.OUTPUT_TYPE, self.OUTPUT_TYPE))
         ds = ds.batch(self.config.VALID_BATCH_SIZE)
         return ds
 
 
     def build_ds_test(self):
         ds = tf.data.Dataset.from_generator(
-                lambda: self.tf_generator_id(image_dir=self.config.TEST_PATH_TO_DATA,
-                                                method_name=self.config.TEST_METHOD_NAME,
-                                                patch_size=self.config.TEST_METHOD_PATCH_SIZE,
-                                                stride=self.config.TEST_METHOD_STRIDE
-                                                ),
-                (self.OUTPUT_TYPE, self.OUTPUT_TYPE))
+                lambda: self.tf_generator(image_dir=self.config.TEST_PATH_TO_DATA,
+                                            method_name=self.config.TEST_METHOD_NAME,
+                                            patch_size=self.config.TEST_METHOD_PATCH_SIZE,
+                                            stride=self.config.TEST_METHOD_STRIDE),
+                (self.OUTPUT_TYPE, self.OUTPUT_TYPE, self.OUTPUT_TYPE))
         ds = ds.batch(self.config.TEST_BATCH_SIZE)
         return ds
 
 
-
-    def tf_generator_gt(self, image_dir:str, gt_dir:str, method_name:str, gt_foreground_threshold:float, patch_size=None, stride=None):
-        assert method_name in ['patch', 'full']
-
+    def tf_generator(self, image_dir:str, method_name:str, patch_size=None, stride=None, gt_dir=None, gt_foreground_threshold=None):
         for filename in os.listdir(image_dir):
             # load image and gt
             img = np.asarray(Image.open(image_dir + '/' + filename))
-            gt = np.asarray(Image.open(gt_dir + '/' + filename))
+            gt = 0
 
-            # reshape gt
-            gt = gt.reshape((gt.shape[0], gt.shape[1], 1))
-
-            # process gt such that each pixel is: road=1, background=0
-            gt = gt / 255.0
-            gt = np.where(gt>gt_foreground_threshold, 1, 0)
-
-            if(method_name=='patch'):
-                img_patches = isam.split_into_patches(image=img, patch_size=(patch_size,  patch_size, 3), stride=stride)
-                img_patches_flatten, _ = isam.flatten_patches(img_patches, 0)
-
-                gt_patches = isam.split_into_patches(image=gt, patch_size=(patch_size, patch_size, 1), stride=stride)
-                gt_patches_flatten, _ = isam.flatten_patches(gt_patches, 0)
-
-                for img_patch, gt_patch in zip(img_patches_flatten, gt_patches_flatten):
-                    yield(img_patch, gt_patch)
-            else:
-                yield(img, gt)
-
-    def tf_generator_id(self, image_dir:str, method_name:str, patch_size=None, stride=None):
-        assert method_name in ['patch', 'full']
-
-        for filename in os.listdir(image_dir):
-            # load image and extract id from filename
-            img = np.asarray(Image.open(image_dir + '/' + filename))
             id = int(re.search('\d+', filename).group(0))
 
-            if(method_name=='patch'):
-                img_patches = isam.split_into_patches(image=img, patch_size=(patch_size, patch_size, 3), stride=stride)
+            if gt_dir is not None: # has gt
+                gt = np.asarray(Image.open(gt_dir + '/' + filename))
+                gt = gt.reshape((gt.shape[0], gt.shape[1], 1))
+
+                # process gt such that each pixel is: road=1, background=0
+                gt = gt / 255.0
+                gt = np.where(gt>gt_foreground_threshold, 1, 0)
+
+            if method_name == 'patch':
+                img_patches = isam.split_into_patches(image=img, patch_size=(patch_size,  patch_size, 3), stride=stride)
                 img_patches_flatten, ids = isam.flatten_patches(img_patches, id)
 
-                for img_patch, id in zip(img_patches_flatten, ids):
-                    yield(img_patch, id)
+                if gt_dir is not None:
+                    gt_patches = isam.split_into_patches(image=gt, patch_size=(patch_size, patch_size, 1), stride=stride)
+                    gt_patches_flatten, _ = isam.flatten_patches(gt_patches, id)
+                else:
+                    gt_patches_flatten = np.zeros((img_patches_flatten.shape[0], 1, 1, 1))
+
+                for img_patch, gt_patch, id in zip(img_patches_flatten, gt_patches_flatten, ids):
+                    yield(img_patch, gt_patch, id)
+            elif method_name == 'full':
+                yield(img, gt, id)
             else:
-                yield(img, id)
+                raise ValueError('Unknown method')
 
 
     def build_augmentation_pipeline(self, path_to_data: str, path_to_groundtruth:str , seed = None):
@@ -178,9 +166,11 @@ class Dataset():
 
 
         # STREET BRIGHTNESS AUGMENTATION
-        # TODO [nku] move params to parameter file
-        street_brightness = StreetBrightnessAugmentation(probability=0.3, min_brightness_change = -5, max_brightness_change = 20, fg_threshold = 60)
-        #p.add_operation(street_brightness)
+        street_brightness = StreetBrightnessAugmentation(probability=self.config.AUG_STREET_BRIGHTNESS_PROB,
+                                                            min_brightness_change = self.config.AUG_STREET_BRIGHTNESS_MIN_CHANGE,
+                                                            max_brightness_change = self.config.AUG_STREET_BRIGHTNESS_MAX_CHANGE,
+                                                            fg_threshold = self.config.AUG_STREET_BRIGHTNESS_FG_THRESHOLD)
+        p.add_operation(street_brightness)
 
 
 
@@ -239,7 +229,7 @@ class CustomPipeline(Augmentor.Pipeline):
             gt = gt / 255.0
             gt = np.where(gt>self.gt_foreground_threshold, 1.0, 0.0)
 
-            yield (img, gt)
+            yield (img, gt, random_image_index)
 
 
     def _tf_execute(self, augmentor_image):

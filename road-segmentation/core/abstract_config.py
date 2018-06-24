@@ -23,6 +23,10 @@ class AbstractConfig(ABC):
         if not os.path.exists(self.TEST_OUTPUT_DIR):
             os.makedirs(self.TEST_OUTPUT_DIR)
 
+        self.SUBMISSION_DIR = self.OUTPUT_DIR + 'submission/'
+        if not os.path.exists(self.SUBMISSION_DIR):
+            os.makedirs(self.SUBMISSION_DIR)
+
     BASE_DIR = './../'
 
 
@@ -62,12 +66,16 @@ class AbstractConfig(ABC):
     '''
     VALID_PATH_TO_DATA = BASE_DIR + 'data/validation/images'
     VALID_PATH_TO_GROUNDTRUTH = BASE_DIR + 'data/validation/groundtruth'
+    VALID_IMAGE_SIZE = 400
     VALID_BATCH_SIZE = 20
 
     VALID_METHOD_NAME = 'patch'     # patch or full
     VALID_METHOD_PATCH_SIZE = 200   # only for patch
     VALID_METHOD_STRIDE = 200        # only for patch
 
+    VALID_N_PATCHES_PER_IMAGE = (VALID_IMAGE_SIZE - VALID_METHOD_PATCH_SIZE)/ VALID_METHOD_STRIDE + 1
+    VALID_IMAGE_NAME_FORMAT = 'satImage_{0:03d}.png'
+    VALID_PATH_TO_ARRAYS = BASE_DIR + 'data/validation/arrays/'
 
     '''
       _____       _
@@ -165,6 +173,13 @@ class AbstractConfig(ABC):
     AUG_COLOR_PCA_EVALS = np.array([6927.25308594, 46.78135866, 22.71954328])
     AUG_COLOR_PCA_MU = 0
     AUG_COLOR_PCA_SIGMA = 0.1
+
+    AUG_STREET_BRIGHTNESS_PROB = 0.3
+    AUG_STREET_BRIGHTNESS_MIN_CHANGE = -5
+    AUG_STREET_BRIGHTNESS_MAX_CHANGE = 20
+    AUG_STREET_BRIGHTNESS_FG_THRESHOLD = 60
+
+
 
     # performs a random, elastic gaussian distortion on an image
     # param see https://github.com/mdbloice/Augmentor/blob/master/Augmentor/Pipeline.py
