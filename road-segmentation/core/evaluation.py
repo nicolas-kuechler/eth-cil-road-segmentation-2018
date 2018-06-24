@@ -68,18 +68,9 @@ class Evaluation():
                                                 image_size=(self.config.TEST_IMAGE_SIZE, self.config.TEST_IMAGE_SIZE, 1),
                                                 stride=self.config.TEST_METHOD_STRIDE)
                 img_id = int(ids[start, 0])
-                self.append_prediction(submission_file, img[:, :, 0], img_id)
+                img = img[:,:,0]
 
-
-                # scale back
-                img = img * 255
-                img = Image.fromarray(img[:,:,0].astype('uint8'))
-                img.save(self.config.TEST_OUTPUT_DIR + 'out{}.png'.format(img_id))
-
-                img = img.convert('RGBA')
-                img_test = img_test.convert('RGBA')
-                overlay = Image.blend(img_test, img, 0.5)
-                overlay.save(self.config.TEST_OUTPUT_DIR + f'blended{img_id}.png')
+                self.process_submission(img, img_id, submission_file)
 
         elif self.config.TEST_METHOD_NAME == 'full':
             n_images = predictions.shape[0]
@@ -87,22 +78,26 @@ class Evaluation():
             for i in range(n_images):
                 img = predictions[i, :, :, 0]
                 img_id = int(ids[i])
-                self.append_prediction(submission_file, img, img_id)
-                img = img * 255
-                img = Image.fromarray(img.astype('uint8'))
-                img_test = Image.open(self.config.TEST_PATH_TO_DATA + f'/test_{img_id}.png')
-
-                img.save(self.config.TEST_OUTPUT_DIR + 'out{}.png'.format(img_id))
-
-                img = img.convert('RGBA')
-                img_test = img_test.convert('RGBA')
-                overlay = Image.blend(img_test, img, 0.5)
-                overlay.save(self.config.TEST_OUTPUT_DIR + f'blended_{img_id}.png')
+                self.process_submission(img, img_id, submission_file)
 
         else:
             raise ValueError('Unknown Test Method Name')
 
-        print('Evaluation Finish   ed: saved {} masks to {}'.format(n_images, self.config.TEST_OUTPUT_DIR))
+        print('Evaluation Finished: saved {} masks to {}'.format(n_images, self.config.TEST_OUTPUT_DIR))
+
+    def process_submission(self, img, img_id, submission_file):
+        self.append_prediction(submission_file, img, img_id)
+
+        img = img * 255
+        img = Image.fromarray(img.astype('uint8'))
+
+        img_test = Image.open(self.config.TEST_PATH_TO_DATA + f'/test_{img_id}.png')
+        img.save(self.config.TEST_OUTPUT_DIR + 'out{}.png'.format(img_id))
+
+        img = img.convert('RGBA')
+        img_test = img_test.convert('RGBA')
+        overlay = Image.blend(img_test, img, 0.5)
+        overlay.save(self.config.TEST_OUTPUT_DIR + f'blended{img_id}.png')
 
     def append_prediction(self, submission_file, prediction, id):
         with open(submission_file, 'a') as f:
