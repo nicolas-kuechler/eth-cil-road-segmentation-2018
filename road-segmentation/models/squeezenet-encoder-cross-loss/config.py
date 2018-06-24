@@ -26,7 +26,6 @@ class Config(AbstractConfig):
     FILTERS_EXPAND3 =   [64, 64, 128, 128, 192, 192, 256, 256]
     DROPOUTS =  [0, 0, 0, 0, 0, 0, 0, 1]
     MAX_POOLS = [1, 0, 0, 1, 0, 0, 0, 1]
-    AUG_GAUSSIAN_DISTORTION_PROB
 
     AUG_SHEAR_PROB = 0.0000001
     AUG_ROTATE_RANDOM_90_PROB = 0.66
