@@ -179,7 +179,10 @@ class AbstractConfig(ABC):
     AUG_STREET_BRIGHTNESS_MAX_CHANGE = 20
     AUG_STREET_BRIGHTNESS_FG_THRESHOLD = 60
 
-
+    # Gaussian blur
+    AUG_GAUSSIAN_BLUR_PROB = 0.2
+    AUG_GAUSSIAN_BLUR_PROB_MIN_SIGMA = 0.01
+    AUG_GAUSSIAN_BLUR_PROB_MAX_SIGMA = 5
 
     # performs a random, elastic gaussian distortion on an image
     # param see https://github.com/mdbloice/Augmentor/blob/master/Augmentor/Pipeline.py

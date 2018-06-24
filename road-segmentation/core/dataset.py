@@ -2,7 +2,9 @@ import numpy as np
 import tensorflow as tf
 import Augmentor, random, os, re
 from PIL import Image
+from PIL import ImageFilter
 from utility import image_split_and_merge as isam
+from skimage.filters import gaussian_filter
 
 class Dataset():
 
@@ -172,7 +174,11 @@ class Dataset():
                                                             fg_threshold = self.config.AUG_STREET_BRIGHTNESS_FG_THRESHOLD)
         p.add_operation(street_brightness)
 
-
+        # GAUSSIAN BLUR
+        gaussian = GaussianBlur(probability=self.config.AUG_GAUSSIAN_BLUR_PROB,
+                                min_sigma=self.config.AUG_GAUSSIAN_BLUR_MIN_SIGMA,
+                                max_sigma=self.config.AUG_GAUSSIAN_BLUR_MAX_SIGMA)
+        p.add_operation(gaussian)
 
 
         # NOISE AUGMENTATION
@@ -310,3 +316,26 @@ class StreetBrightnessAugmentation(Augmentor.Operations.Operation):
         images[0] = Image.fromarray(img.astype('uint8'))
 
         return images
+
+class GaussianBlur(Augmentor.Operations.Operation):
+    def __init__(self, probability, min_sigma, max_sigma):
+        Augmentor.Operations.Operation.__init__(self, probability)
+
+        self.min_sigma = min_sigma
+        self.max_sigma = max_sigma
+
+    def perform_operation(self, images):
+
+        augmented_images = []
+        for image in images:
+
+            img_array = np.asarray(image)
+            shape = img_array.shape
+            if(len(shape) == 3 and shape[2] == self.evals.shape[0]):
+                image = image.filter(ImageFilter.GaussianBlur(np.random.uniform(self.min_sigma, self.max_sigma)))
+                augmented_images.append(image)
+            else:
+                augmented_images.append(image) # skip groundtruth images
+
+        # Return the image so that it can further processed in the pipeline:
+        return augmented_images
