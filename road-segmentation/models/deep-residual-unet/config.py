@@ -16,7 +16,7 @@ class Config(AbstractConfig):
     TEST_METHOD_STRIDE = 152       # only for patch
 
     N_EPOCHS = 50
-    N_BATCHES_PER_EPOCH = 500
+    N_BATCHES_PER_EPOCH = 1000
     TRAIN_BATCH_SIZE = 8
 
     LEARNING_RATE = 0.001

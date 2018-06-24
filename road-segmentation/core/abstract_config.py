@@ -62,12 +62,16 @@ class AbstractConfig(ABC):
     '''
     VALID_PATH_TO_DATA = BASE_DIR + 'data/validation/images'
     VALID_PATH_TO_GROUNDTRUTH = BASE_DIR + 'data/validation/groundtruth'
+    VALID_IMAGE_SIZE = 400
     VALID_BATCH_SIZE = 20
 
     VALID_METHOD_NAME = 'patch'     # patch or full
     VALID_METHOD_PATCH_SIZE = 200   # only for patch
     VALID_METHOD_STRIDE = 200        # only for patch
 
+    VALID_N_PATCHES_PER_IMAGE = (VALID_IMAGE_SIZE - VALID_METHOD_PATCH_SIZE)/ VALID_METHOD_STRIDE + 1
+    VALID_IMAGE_NAME_FORMAT = 'satImage_{0:03d}.png'
+    VALID_PATH_TO_ARRAYS = BASE_DIR + 'data/validation/arrays/'
 
     '''
       _____       _

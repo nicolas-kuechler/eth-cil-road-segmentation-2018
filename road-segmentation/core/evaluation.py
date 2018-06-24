@@ -18,7 +18,7 @@ class Evaluation():
         self.sess.run(self.model.dataset.init_op_test) # switch to test dataset
 
         predictions = []
-        labels =  []
+        ids =  []
 
         count = 0
 
@@ -29,18 +29,18 @@ class Evaluation():
                 count += 1
                 fetches = {
                     'predictions': self.model.predictions,
-                    'labels': self.model.labels
+                    'ids': self.model.ids
                 }
 
                 output = self.sess.run(fetches)
 
                 predictions.append(output['predictions'])
-                labels.append(output['labels'])
+                ids.append(output['ids'])
 
             except tf.errors.OutOfRangeError:
                 break
 
-        labels = np.concatenate(labels, axis=0)
+        ids = np.concatenate(ids, axis=0)
         predictions = np.concatenate(predictions, axis=0)
 
         # We start with a new submission file, delete previous one if it exists
@@ -64,10 +64,10 @@ class Evaluation():
                 end = start + n_patches_per_image
 
                 img = isam.merge_into_image_from_flatten(patches_flatten=predictions[start:end, : ,: , :],
-                                                index=labels[start:end, :],
+                                                index=ids[start:end, :],
                                                 image_size=(self.config.TEST_IMAGE_SIZE, self.config.TEST_IMAGE_SIZE, 1),
                                                 stride=self.config.TEST_METHOD_STRIDE)
-                img_id = int(labels[start, 0])
+                img_id = int(ids[start, 0])
                 self.append_prediction(submission_file, img[:, :, 0], img_id)
 
 
@@ -85,6 +85,7 @@ class Evaluation():
                 self.append_prediction(submission_file, img, img_id)
                 img = img * 255
                 img = Image.fromarray(img.astype('uint8'))
+                img_id = int(ids[i])
                 img.save(self.config.TEST_OUTPUT_DIR + 'out{}.png'.format(img_id))
         else:
             raise ValueError('Unknown Test Method Name')

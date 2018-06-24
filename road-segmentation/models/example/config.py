@@ -15,3 +15,7 @@ class Config(AbstractConfig):
     VALID_METHOD_NAME = 'full'
     SUMMARY_IMAGE_EVERY_STEP = 3
     # Define new Configurations for your Model
+
+    VALID_METHOD_NAME = 'full'
+    TRAIN_METHOD_NAME = 'full'
+    TEST_METHOD_NAME = 'full'
