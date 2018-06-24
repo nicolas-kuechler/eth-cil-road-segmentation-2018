@@ -180,7 +180,7 @@ class Dataset():
         # STREET BRIGHTNESS AUGMENTATION
         # TODO [nku] move params to parameter file
         street_brightness = StreetBrightnessAugmentation(probability=0.3, min_brightness_change = -5, max_brightness_change = 20, fg_threshold = 60)
-        p.add_operation(street_brightness)
+        #p.add_operation(street_brightness)
 
 
 
