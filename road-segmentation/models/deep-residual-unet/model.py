@@ -55,15 +55,15 @@ class Model(AbstractModel):
 
 
     def decoder(self, input, shortcut1, shortcut2, shortcut3):
-        ups1 = tf.keras.layers.UpSampling2D(size=(2,2))(input) # TODO [nku] try transpose conv
+        ups1 = tf.keras.layers.UpSampling2D(size=(2,2))(input)
         concat1 = tf.concat([shortcut1, ups1], axis=3)
         decoding1 = self.res_unit(concat1, filters=[256,256], strides=[1,1], name='decoding1')
 
-        ups2 = tf.keras.layers.UpSampling2D(size=(2,2))(decoding1) # TODO [nku] try transpose conv
+        ups2 = tf.keras.layers.UpSampling2D(size=(2,2))(decoding1)
         concat2 = tf.concat([shortcut2, ups2], axis=3)
         decoding2 = self.res_unit(concat2, filters=[128,128], strides=[1,1], name='decoding2')
 
-        ups3 = tf.keras.layers.UpSampling2D(size=(2,2))(decoding2) # TODO [nku] try transpose conv
+        ups3 = tf.keras.layers.UpSampling2D(size=(2,2))(decoding2)
         concat3 = tf.concat([shortcut3, ups3], axis=3)
         decoding3 = self.res_unit(concat3, filters=[64,64], strides=[1,1], name='decoding3')
 

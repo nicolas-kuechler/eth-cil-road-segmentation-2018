@@ -95,8 +95,11 @@ class Dataset():
                 img_patches = isam.split_into_patches(image=img, patch_size=(patch_size,  patch_size, 3), stride=stride)
                 img_patches_flatten, ids = isam.flatten_patches(img_patches, id)
 
-                gt_patches = isam.split_into_patches(image=gt, patch_size=(patch_size, patch_size, 1), stride=stride)
-                gt_patches_flatten, _ = isam.flatten_patches(gt_patches, id)
+                if gt_dir is not None:
+                    gt_patches = isam.split_into_patches(image=gt, patch_size=(patch_size, patch_size, 1), stride=stride)
+                    gt_patches_flatten, _ = isam.flatten_patches(gt_patches, id)
+                else:
+                    gt_patches_flatten = np.zeros((img_patches_flatten.shape[0], 1, 1, 1))
 
                 for img_patch, gt_patch, id in zip(img_patches_flatten, gt_patches_flatten, ids):
                     yield(img_patch, gt_patch, id)
@@ -163,8 +166,10 @@ class Dataset():
 
 
         # STREET BRIGHTNESS AUGMENTATION
-        # TODO [nku] move params to parameter file
-        street_brightness = StreetBrightnessAugmentation(probability=0.3, min_brightness_change = -5, max_brightness_change = 20, fg_threshold = 60)
+        street_brightness = StreetBrightnessAugmentation(probability=self.config.AUG_STREET_BRIGHTNESS_PROB,
+                                                            min_brightness_change = self.config.AUG_STREET_BRIGHTNESS_MIN_CHANGE,
+                                                            max_brightness_change = self.config.AUG_STREET_BRIGHTNESS_MAX_CHANGE,
+                                                            fg_threshold = self.config.AUG_STREET_BRIGHTNESS_FG_THRESHOLD)
         p.add_operation(street_brightness)
 
 

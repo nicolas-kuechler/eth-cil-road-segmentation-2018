@@ -23,6 +23,10 @@ class AbstractConfig(ABC):
         if not os.path.exists(self.TEST_OUTPUT_DIR):
             os.makedirs(self.TEST_OUTPUT_DIR)
 
+        self.SUBMISSION_DIR = self.OUTPUT_DIR + 'submission/'
+        if not os.path.exists(self.SUBMISSION_DIR):
+            os.makedirs(self.SUBMISSION_DIR)
+
     BASE_DIR = './../'
 
 
@@ -169,6 +173,13 @@ class AbstractConfig(ABC):
     AUG_COLOR_PCA_EVALS = np.array([6927.25308594, 46.78135866, 22.71954328])
     AUG_COLOR_PCA_MU = 0
     AUG_COLOR_PCA_SIGMA = 0.1
+
+    AUG_STREET_BRIGHTNESS_PROB = 0.3
+    AUG_STREET_BRIGHTNESS_MIN_CHANGE = -5
+    AUG_STREET_BRIGHTNESS_MAX_CHANGE = 20
+    AUG_STREET_BRIGHTNESS_FG_THRESHOLD = 60
+
+
 
     # performs a random, elastic gaussian distortion on an image
     # param see https://github.com/mdbloice/Augmentor/blob/master/Augmentor/Pipeline.py

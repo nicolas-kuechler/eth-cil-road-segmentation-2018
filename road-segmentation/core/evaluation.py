@@ -44,7 +44,7 @@ class Evaluation():
         predictions = np.concatenate(predictions, axis=0)
 
         # We start with a new submission file, delete previous one if it exists
-        submission_file = self.config.TEST_OUTPUT_DIR + 'submission.csv'
+        submission_file = self.config.SUBMISSION_DIR + 'submission.csv'
         try:
             os.remove(submission_file)
         except OSError:
