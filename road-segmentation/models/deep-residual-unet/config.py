@@ -14,6 +14,7 @@ class Config(AbstractConfig):
 
     TEST_METHOD_PATCH_SIZE = 304   # only for patch
     TEST_METHOD_STRIDE = 152       # only for patch
+    TEST_N_PATCHES_PER_IMAGE = (608 - TEST_METHOD_PATCH_SIZE)/ TEST_METHOD_STRIDE + 1
 
     N_EPOCHS = 50
     N_BATCHES_PER_EPOCH = 1000
@@ -41,4 +42,3 @@ class Config(AbstractConfig):
     AUG_COLOR_PCA_SIGMA = 0.25
 
     # Define new Configurations for your Model
-	
