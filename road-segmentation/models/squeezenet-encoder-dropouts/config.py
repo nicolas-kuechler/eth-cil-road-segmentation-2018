@@ -7,7 +7,7 @@ class Config(AbstractConfig):
 
 
     # Overwrite any Configurations from Abstract Config
-    N_EPOCHS = 30
+    N_EPOCHS = 45
     N_BATCHES_PER_EPOCH = 100
     LEARNING_RATE = 0.0001
     TRAIN_METHOD_NAME = 'full' # patch or full
@@ -28,3 +28,7 @@ class Config(AbstractConfig):
     MAX_POOLS = [1, 0, 0, 1, 0, 0, 0, 1]
 
     DROPOUT_PROB = 0.8
+
+    AUG_GAUSSIAN_BLUR_PROB = 0.00001
+    AUG_GAUSSIAN_BLUR_MIN_SIGMA = 0.01
+    AUG_GAUSSIAN_BLUR_MAX_SIGMA = 5
