@@ -34,7 +34,7 @@ class Model(AbstractModel):
                                                       padding='same', name='final_conv', activation=tf.sigmoid)
         patch_predictions = tf.layers.average_pooling2d(inputs=self.predictions, pool_size=16, strides=16,
                                                         padding='same', name='avg_patches')
-        patch_predictions = tf.cast(patch_predictions > self.TEST_PATCH_FOREGROUND_THRESHOLD, tf.int32)
+        patch_predictions = tf.cast(patch_predictions > self.config.TEST_PATCH_FOREGROUND_THRESHOLD, tf.int32)
 
 
         # Define predictions, train_op, loss

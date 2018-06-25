@@ -93,7 +93,7 @@ elif mode == 'test':
         avg_prediction = avg_prediction / float(len(predictions))
 
         # could add postprocessing here
-        submission.add(prediction=max_prediction, img_id=id)
+        submission.add(prediction=avg_prediction, img_id=id)
 
     submission.write()
 
