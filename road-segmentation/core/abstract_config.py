@@ -23,10 +23,6 @@ class AbstractConfig(ABC):
         if not os.path.exists(self.TEST_OUTPUT_DIR):
             os.makedirs(self.TEST_OUTPUT_DIR)
 
-        self.SUBMISSION_DIR = self.OUTPUT_DIR + 'submission/'
-        if not os.path.exists(self.SUBMISSION_DIR):
-            os.makedirs(self.SUBMISSION_DIR)
-
     BASE_DIR = './../'
 
 
@@ -53,6 +49,7 @@ class AbstractConfig(ABC):
     LEARNING_RATE = 1.0
     LEARNING_RATE_DECAY_STEPS = 1000
     LEARNING_RATE_DECAY_RATE = 0.95
+    LEARNING_RATE_STAIRCASE = False
 
     OPTIMIZER = tf.train.AdamOptimizer
     USE_GRADIENT_CLIPPING = True
@@ -88,10 +85,14 @@ class AbstractConfig(ABC):
     TEST_BATCH_SIZE = 20
 
     TEST_METHOD_NAME = 'patch'     # patch or full
-    TEST_METHOD_PATCH_SIZE = 200   # only for patch
-    TEST_METHOD_STRIDE = 136        # only for patch
+    TEST_METHOD_PATCH_SIZE = 200   # only for patch     -> here must be a single value but in actual config could be list
+    TEST_METHOD_STRIDE = 136        # only for patch    - > here must be a single value but in actual config could be list
+
+    TEST_ROTATION_DEGREE = 0   # can also be a list
 
     TEST_N_PATCHES_PER_IMAGE = (TEST_IMAGE_SIZE - TEST_METHOD_PATCH_SIZE)/ TEST_METHOD_STRIDE + 1
+
+    TEST_PATCH_FOREGROUND_THRESHOLD = 0.25
 
     '''
       _____                      __ _
@@ -108,6 +109,22 @@ class AbstractConfig(ABC):
     SUMMARY_IMAGE_EVERY_STEP = N_BATCHES_PER_EPOCH
     SUMMARY_IMAGE_MAX_OUTPUTS = 3
     SUMMARY_FULL_IMAGE_MAX_OUTPUTS = 10 # number of images per batch in validation and test (with method 'full' -> 10 means show all validation images)
+
+    '''
+      ___      _          _       _
+     / __|_  _| |__ _ __ (_)_____(_)___ _ _
+     \__ \ || | '_ \ '  \| (_-<_-< / _ \ ' \
+     |___/\_,_|_.__/_|_|_|_/__/__/_\___/_||_|
+
+    '''
+
+    SUB_WRITE_PREDICTIONS = True
+    SUB_WRITE_CSV = True
+    SUB_WRITE_MASKS = True
+    SUB_WRITE_OVERLAYS = True
+    SUB_WRITE_MASK_OVERLAYS = True
+    SUB_WRITE_INDIVIDUAL_PREDICTIONS = False
+
 
 
     '''
