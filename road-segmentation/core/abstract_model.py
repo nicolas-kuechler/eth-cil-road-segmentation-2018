@@ -58,7 +58,7 @@ class AbstractModel(ABC):
                                             global_step=self.global_step,
                                             decay_steps=self.config.LEARNING_RATE_DECAY_STEPS,
                                             decay_rate=self.config.LEARNING_RATE_DECAY_RATE,
-                                            staircase=False)
+                                            staircase=self.config.LEARNING_RATE_STAIRCASE)
             self.lr_decay_op = tf.identity(self.lr)
         elif self.config.LEARNING_RATE_TYPE == 'linear':
             self.lr = tf.Variable(self.config.LEARNING_RATE, trainable=False)
