@@ -59,7 +59,7 @@ class Model(AbstractModel):
                 input = tf.layers.batch_normalization(input, training=self.is_training)
                 connections.append(input)
 
-        if self.config.DROPOUTS[layer_number]:
+        if self.config.DROPOUTS[layer_number] and self.is_training:
             with tf.name_scope(name='dropout' + str(layer_number)):
                 input = tf.nn.dropout(input, keep_prob=0.5)
 
