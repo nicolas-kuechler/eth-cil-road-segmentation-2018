@@ -70,22 +70,35 @@ class Dataset():
                 lambda: self.tf_generator(image_dir=self.config.TEST_PATH_TO_DATA,
                                             method_name=self.config.TEST_METHOD_NAME,
                                             patch_size=self.config.TEST_METHOD_PATCH_SIZE,
-                                            stride=self.config.TEST_METHOD_STRIDE),
+                                            stride=self.config.TEST_METHOD_STRIDE,
+                                            rotation=self.config.TEST_ROTATION_DEGREE),
                 (self.OUTPUT_TYPE, self.OUTPUT_TYPE, self.OUTPUT_TYPE))
         ds = ds.batch(self.config.TEST_BATCH_SIZE)
         return ds
 
 
-    def tf_generator(self, image_dir:str, method_name:str, patch_size=None, stride=None, gt_dir=None, gt_foreground_threshold=None):
+    def tf_generator(self, image_dir:str, method_name:str, patch_size=None, stride=None, gt_dir=None, gt_foreground_threshold=None, rotation=None):
         for filename in os.listdir(image_dir):
             # load image and gt
-            img = np.asarray(Image.open(image_dir + '/' + filename))
+            img = Image.open(image_dir + '/' + filename)
+
+            # augment image
+            if rotation is not None:
+                img = img.rotate(rotation, expand=False, resample=Image.BICUBIC)
+
+            img = np.asarray(img)
             gt = 0
 
             id = int(re.search('\d+', filename).group(0))
 
             if gt_dir is not None: # has gt
-                gt = np.asarray(Image.open(gt_dir + '/' + filename))
+                gt = Image.open(gt_dir + '/' + filename)
+
+                # augment gt
+                if rotation is not None:
+                    gt = gt.rotate(rotation, expand=False, resample=Image.BICUBIC)
+
+                gt = np.asarray(gt)
                 gt = gt.reshape((gt.shape[0], gt.shape[1], 1))
 
                 # process gt such that each pixel is: road=1, background=0

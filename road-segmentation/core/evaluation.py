@@ -3,6 +3,8 @@ import numpy as np
 from PIL import Image
 from utility import image_split_and_merge as isam
 import os
+from tqdm import tqdm
+from utility import util
 
 class Evaluation():
 
@@ -20,13 +22,11 @@ class Evaluation():
         predictions = []
         ids =  []
 
-        count = 0
+        pbar = tqdm(total=self.config.TEST_N_PATCHES_PER_IMAGE, unit=' pred')
 
         # loop through test dataset and get predictions
         while(True):
             try:
-                print('Iter: ', count)
-                count += 1
                 fetches = {
                     'predictions': self.model.predictions,
                     'ids': self.model.ids
@@ -37,21 +37,17 @@ class Evaluation():
                 predictions.append(output['predictions'])
                 ids.append(output['ids'])
 
+                pbar.update(self.config.TEST_BATCH_SIZE)
+
             except tf.errors.OutOfRangeError:
                 break
+
+        pbar.close()
 
         ids = np.concatenate(ids, axis=0)
         predictions = np.concatenate(predictions, axis=0)
 
-        # We start with a new submission file, delete previous one if it exists
-        submission_file = self.config.SUBMISSION_DIR + 'submission.csv'
-        try:
-            os.remove(submission_file)
-        except OSError:
-            pass
-        with open(submission_file, 'a') as f:
-            f.write('id,prediction\n')
-
+        pred_dict = {}
 
         if self.config.TEST_METHOD_NAME == 'patch':
             # if patch based -> put images back together
@@ -70,7 +66,9 @@ class Evaluation():
                 img_id = int(ids[start, 0])
                 img = img[:,:,0]
 
-                self.process_submission(img, img_id, submission_file)
+                img = self.invert_augmentation(img)
+
+                pred_dict[img_id] = img
 
         elif self.config.TEST_METHOD_NAME == 'full':
             n_images = predictions.shape[0]
@@ -78,45 +76,20 @@ class Evaluation():
             for i in range(n_images):
                 img = predictions[i, :, :, 0]
                 img_id = int(ids[i])
-                self.process_submission(img, img_id, submission_file)
 
+                img = self.invert_augmentation(img)
+
+                pred_dict[img_id] = img
         else:
             raise ValueError('Unknown Test Method Name')
 
-        print('Evaluation Finished: saved {} masks to {}'.format(n_images, self.config.TEST_OUTPUT_DIR))
+        print('Evaluation Finished')
+        return pred_dict
 
-    def process_submission(self, img, img_id, submission_file):
-        self.append_prediction(submission_file, img, img_id)
+    def invert_augmentation(self, img):
+        if self.config.TEST_ROTATION_DEGREE is not 0:
+            img = util.to_image(img)
+            img = img.rotate(-1 * self.config.TEST_ROTATION_DEGREE, expand=False, resample=Image.BICUBIC)
+            img = util.to_array(img)
 
-        img = img * 255
-        img = Image.fromarray(img.astype('uint8'))
-
-        img_test = Image.open(self.config.TEST_PATH_TO_DATA + f'/test_{img_id}.png')
-        img.save(self.config.TEST_OUTPUT_DIR + 'out{}.png'.format(img_id))
-
-        img = img.convert('RGBA')
-        img_test = img_test.convert('RGBA')
-        overlay = Image.blend(img_test, img, 0.5)
-        overlay.save(self.config.TEST_OUTPUT_DIR + f'blended{img_id}.png')
-
-    def append_prediction(self, submission_file, prediction, id):
-        with open(submission_file, 'a') as f:
-            f.writelines('{}\n'.format(s) for s in self.prediction_to_submission(prediction, id))
-
-    def prediction_to_submission(self, prediction, id):
-        patch_size = 16
-        for j in range(0, prediction.shape[1], patch_size):
-            for i in range(0, prediction.shape[0], patch_size):
-                patch = prediction[i:i + patch_size, j:j + patch_size]
-                label = self.patch_to_label(patch)
-                yield ("{:03d}_{}_{},{}".format(id, j, i, label))
-
-
-    # assign a label to a patch
-    def patch_to_label(self, patch):
-        foreground_threshold = 0.25  # percentage of pixels > 1 required to assign a foreground label to a patch
-        df = np.mean(patch)
-        if df > foreground_threshold:
-            return 1
-        else:
-            return 0
+        return img
