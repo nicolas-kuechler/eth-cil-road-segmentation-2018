@@ -12,15 +12,21 @@ from utility import util
 # Parse Argument to Load Model and Config
 model_name = parser.args.model_name
 mode = parser.args.mode
+data = parser.args.data
 
 model_module = importlib.import_module('models.' + model_name + ".model")
 Model = model_module.Model
 
+
+
 config_module = importlib.import_module('models.' + model_name + ".config")
 Config = config_module.Config
 
+ext = data == 'ext'
+if ext:
+    model_name = model_name + '_ext'
 
-config = Config(model_name)
+config = Config(model_name, ext)
 
 print('Setting Output Directory: ', config.OUTPUT_DIR)
 

@@ -2,8 +2,8 @@ from core.abstract_config import AbstractConfig
 
 class Config(AbstractConfig):
 
-    def __init__(self, model_name: str):
-        super().__init__(model_name)
+    def __init__(self, model_name: str, ext):
+        super().__init__(model_name, ext)
 
 
     # Overwrite any Configurations from Abstract Config

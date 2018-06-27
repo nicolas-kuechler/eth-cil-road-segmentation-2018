@@ -5,7 +5,7 @@ import tensorflow as tf
 
 class AbstractConfig(ABC):
 
-    def __init__(self, model_name: str):
+    def __init__(self, model_name: str, ext):
         self.MODEL_NAME = model_name
 
         self.OUTPUT_DIR = self.BASE_DIR + 'output/' + self.MODEL_NAME + '/'
@@ -22,6 +22,14 @@ class AbstractConfig(ABC):
         self.TEST_OUTPUT_DIR = self.OUTPUT_DIR + 'test_output/'
         if not os.path.exists(self.TEST_OUTPUT_DIR):
             os.makedirs(self.TEST_OUTPUT_DIR)
+
+        if ext:
+            self.TRAIN_PATH_TO_DATA = self.BASE_DIR + 'data/training_extension/images'
+            self.TRAIN_PATH_TO_GROUNDTRUTH = self.BASE_DIR + 'data/training_extension/groundtruth'
+
+            self.VALID_PATH_TO_DATA = self.BASE_DIR + 'data/validation_extension/images'
+            self.VALID_PATH_TO_GROUNDTRUTH = self.BASE_DIR + 'data/validation_extension/groundtruth'
+            self.VALID_PATH_TO_ARRAYS = self.BASE_DIR + 'data/validation_extension/arrays/'
 
     BASE_DIR = './../'
 
@@ -108,7 +116,7 @@ class AbstractConfig(ABC):
 
     SUMMARY_IMAGE_EVERY_STEP = N_BATCHES_PER_EPOCH
     SUMMARY_IMAGE_MAX_OUTPUTS = 3
-    SUMMARY_FULL_IMAGE_MAX_OUTPUTS = 10 # number of images per batch in validation and test (with method 'full' -> 10 means show all validation images)
+    SUMMARY_FULL_IMAGE_MAX_OUTPUTS = 20 # number of images per batch in validation and test (with method 'full' -> 10 means show all validation images)
 
     '''
       ___      _          _       _
