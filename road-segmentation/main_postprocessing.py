@@ -17,10 +17,10 @@ batch_name = args.batch_name
 
 # create Config and Postprocessing
 config = Config( batch_name )
-post = Postprocessing()
+post = Postprocessing(config)
 submission = Submission(config)
 
-path_to_test_preds = config.PREDICTIONS_IN_DIR
+path_to_test_preds = config.POST_PREDICTIONS_IN_DIR
 path_to_test_imgs  = config.TEST_IMAGES_IN_DIR
 out_dir = config.OUTPUT_DIR
 if not os.path.exists( out_dir ):
@@ -33,12 +33,13 @@ def get_id_from_filename( file_name ):
 	for el in int_list:
 		result += str( el )
 	return int( result )
+	# return int(''.join(filter(str.isdigit, file_name)))
 
 count = 0
 # do postprocessing on all files in the selected batch
 print ( f'Starting postprocessing...' )
 for f in os.listdir( path_to_test_preds ):
-	if count > config.MAX_NUM_PROCESSES:
+	if count == config.POST_MAX_NUM_IMAGES_TOPROCESS:
 		break
 	ext = os.path.splitext(f)[1]
 	if ext.lower() != '.png':
@@ -49,20 +50,24 @@ for f in os.listdir( path_to_test_preds ):
 	#img_id = int(filter(str.isdigit, f))
 	id = get_id_from_filename( f )
 	img = Image.open( path_to_test_imgs + f'test_{id}.png' )
-	img_arr = util.to_array( img )
-	processed_pred = post.crf( img_arr, pred_arr )
+	#img_arr = util.to_array( img )
+	img_arr = np.asarray( img )
 	
-	# add to submission
-	if config.WRITE_SUBMISSION:
-		submission.add(prediction=processed_pred, img_id=id)
-	else:
-		processed_img = util.to_image( processed_pred )
-		processed_img.save( out_dir + f'post_{id}.png' )
-		# for debugging
-		#if id == 10:
-		#	processed_img.show()
-	count += 1
+	if config.POST_DO_CRFPROCESSING:
+		print ( f'  processing {f}...' )
+		processed_pred = post.crf( img_arr, pred_arr )
+	
+		# add to submission
+		if config.POST_WRITE_SUBMISSION:
+			submission.add(prediction=processed_pred, img_id=id)
+		else:
+			processed_img = util.to_image( processed_pred )
+			processed_img.save( out_dir + f'post_{id}.png' )
+			# for debugging
+			#if id == 10:
+			#	processed_img.show()
+		count += 1
 
-print ( f'Postprocessing finished' )
-if config.WRITE_SUBMISSION:
+print ( f'Postprocessing finished (processed {count} predictions)' )
+if config.POST_WRITE_SUBMISSION:
 	submission.write()
