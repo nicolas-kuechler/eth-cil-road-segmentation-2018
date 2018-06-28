@@ -1,5 +1,4 @@
 # for the checkpoints and logs
-output/
 mirrored/
 
 .idea/*
