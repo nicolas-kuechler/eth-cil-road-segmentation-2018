@@ -15,8 +15,8 @@ class Config(AbstractConfig):
     TEST_METHOD_NAME = 'full'
     SUMMARY_IMAGE_EVERY_STEP = 1000
     TRAIN_BATCH_SIZE = 32
-    SUMMARY_IMAGE_MAX_OUTPUTS = 0
-    SUMMARY_FULL_IMAGE_MAX_OUTPUTS = 0
+    SUMMARY_IMAGE_MAX_OUTPUTS = 1
+    SUMMARY_FULL_IMAGE_MAX_OUTPUTS = 1
 
     # Define new Configurations for your Model
 
