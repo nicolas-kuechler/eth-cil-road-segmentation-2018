@@ -13,8 +13,8 @@ from pydensecrf.utils import create_pairwise_bilateral, create_pairwise_gaussian
 
 class Postprocessing():
 
-    def __init__(self):
-    	pass
+    def __init__(self, config):
+    	self.config = config
         
     def crf(self, image, prediction):
         # prepare input for crf
@@ -29,20 +29,21 @@ class Postprocessing():
         d = dcrf.DenseCRF2D(image.shape[1], image.shape[0], 2)
         d.setUnaryEnergy(unary)
         
-        # penalize small pieces of segmentation which are spatially isolated
-        pairwise_energy = create_pairwise_gaussian(sdims=(2, 2), shape=image.shape[:2])
-        d.addPairwiseEnergy(pairwise_energy, compat=3,
+        # use location features to refine segmentation (color-independent)
+        pairwise_energy = create_pairwise_gaussian(sdims=(self.config.POST_SDIMS_GAUSSIAN_X, self.config.POST_SDIMS_GAUSSIAN_Y), shape=image.shape[:2])
+        d.addPairwiseEnergy(pairwise_energy, compat=self.config.POST_COMPAT_GAUSSIAN,
                             kernel=dcrf.DIAG_KERNEL,
                             normalization=dcrf.NORMALIZE_SYMMETRIC)
         # use local color features to refine segmentation
-        pairwise_energy = create_pairwise_bilateral(sdims=(2, 2), schan=(1,1,1),
+        pairwise_energy = create_pairwise_bilateral(sdims=(self.config.POST_SDIMS_BILATERAL_X, self.config.POST_SDIMS_BILATERAL_Y),
+                                                    schan=(self.config.POST_SCHAN_BILATERAL_R, self.config.POST_SCHAN_BILATERAL_G, self.config.POST_SCHAN_BILATERAL_B),
                                                     img=image, chdim=2)
         d.addPairwiseEnergy(pairwise_energy, compat=3,
                             kernel=dcrf.DIAG_KERNEL,
                             normalization=dcrf.NORMALIZE_SYMMETRIC)
         
         # do inference (with 5 iterations)
-        Q = d.inference(5)
+        Q = d.inference(self.config.POST_NUM_INFERENCE_IT)
         result = np.argmin(Q, axis=0)
         processed_prediction = result.reshape((image.shape[0], image.shape[1]))
         #new_prediction = np.array(Q)
