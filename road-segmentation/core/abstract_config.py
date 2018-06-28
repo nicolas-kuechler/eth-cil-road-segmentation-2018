@@ -1,6 +1,6 @@
 from abc import ABC
 import numpy as np
-import os
+import os, sys
 import tensorflow as tf
 
 class AbstractConfig(ABC):
@@ -134,6 +134,33 @@ class AbstractConfig(ABC):
     SUB_WRITE_INDIVIDUAL_PREDICTIONS = False
 
 
+    '''
+      ___         _                                _
+     |   |___ ___| |_ ___ _ _ ___ ________ _______(_)_ _  __ _
+     | |_/ _ (_-<|  _|   | '_/ _ /  _|/ -_)(_-<_-<| | ' \/ _` |
+     |_| \___/__/ \__| |_|_| \___\___|\___|/__/__/|_|_||_\__, |
+                     |_|                                  |___/
+
+    '''
+    
+    POST_DO_CRFPROCESSING = True
+
+    POST_WRITE_SUBMISSION = True
+    #POST_MAX_NUM_IMAGES_TOPROCESS = 5
+    POST_MAX_NUM_IMAGES_TOPROCESS = sys.maxsize
+    
+    POST_NUM_INFERENCE_IT = 25
+    
+    POST_SDIMS_GAUSSIAN_X = 0.05
+    POST_SDIMS_GAUSSIAN_Y = 0.05
+    POST_COMPAT_GAUSSIAN = 15
+    
+    POST_SDIMS_BILATERAL_X = 120
+    POST_SDIMS_BILATERAL_Y = 120
+    POST_SCHAN_BILATERAL_R = 40
+    POST_SCHAN_BILATERAL_G = 40
+    POST_SCHAN_BILATERAL_B = 40
+    POST_COMPAT_BILATERAL = 8
 
     '''
         _                          _        _   _
