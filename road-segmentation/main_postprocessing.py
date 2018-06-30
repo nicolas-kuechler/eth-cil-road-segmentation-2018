@@ -1,19 +1,26 @@
 import sys, os
 import numpy as np
-import argparse
+import argparse, importlib
 from PIL import Image
 from postprocessing.postprocessing import Postprocessing
-from postprocessing.postprocessing_config import Config
+#from postprocessing.postprocessing_config import Config
 from core.submission import Submission
 from utility import util
 
 
-# parse argument for batch name
+# parse argument for batch name and parameter set name and import corresponding module
 parser = argparse.ArgumentParser(description='Options for Postprocessing')
 parser.add_argument('batch_name', metavar='Batch Name', type=str,
                     help='Name of batch predictions to be processed')
+parser.add_argument('param_set_name', metavar='Parameter Set Name', type=str,
+                    help='Name of parameter set')
+
 args = parser.parse_args()
 batch_name = args.batch_name
+param_set_name = args.param_set_name
+
+config_module = importlib.import_module( 'postprocessing.pp_config_' + param_set_name )
+Config = config_module.Config
 
 # create Config and Postprocessing
 config = Config( batch_name )
@@ -37,7 +44,7 @@ def get_id_from_filename( file_name ):
 
 count = 0
 # do postprocessing on all files in the selected batch
-print ( f'Starting postprocessing...' )
+print ( f'Starting postprocessing of {batch_name} with parameter set {param_set_name}...' )
 for f in os.listdir( path_to_test_preds ):
 	if count == config.POST_MAX_NUM_IMAGES_TOPROCESS:
 		break
