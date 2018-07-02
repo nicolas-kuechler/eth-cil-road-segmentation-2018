@@ -5,7 +5,8 @@ import tensorflow as tf
 
 class AbstractConfig(ABC):
 
-    def __init__(self, model_name: str, ext):
+    def __init__(self, model_name: str, data: str):
+
         self.MODEL_NAME = model_name
 
         self.OUTPUT_DIR = self.BASE_DIR + 'output/' + self.MODEL_NAME + '/'
@@ -23,13 +24,23 @@ class AbstractConfig(ABC):
         if not os.path.exists(self.TEST_OUTPUT_DIR):
             os.makedirs(self.TEST_OUTPUT_DIR)
 
-        if ext:
-            self.TRAIN_PATH_TO_DATA = self.BASE_DIR + 'data/training_extension/images'
-            self.TRAIN_PATH_TO_GROUNDTRUTH = self.BASE_DIR + 'data/training_extension/groundtruth'
 
-            self.VALID_PATH_TO_DATA = self.BASE_DIR + 'data/validation_extension/images'
-            self.VALID_PATH_TO_GROUNDTRUTH = self.BASE_DIR + 'data/validation_extension/groundtruth'
-            self.VALID_PATH_TO_ARRAYS = self.BASE_DIR + 'data/validation_extension/arrays/'
+        if data == 'ext-half':
+            self.TRAIN_PATH_TO_DATA = self.BASE_DIR + 'data/training_extension_half/images'
+            self.TRAIN_PATH_TO_GROUNDTRUTH = self.BASE_DIR + 'data/training_extension_half/groundtruth'
+
+            self.VALID_PATH_TO_DATA = self.BASE_DIR + 'data/validation_extension_half/images'
+            self.VALID_PATH_TO_GROUNDTRUTH = self.BASE_DIR + 'data/validation_extension_half/groundtruth'
+            self.VALID_PATH_TO_ARRAYS = self.BASE_DIR + 'data/validation_extension_half/arrays/'
+        elif data == 'ext-full':
+            self.TRAIN_PATH_TO_DATA = self.BASE_DIR + 'data/training_extension_full/images'
+            self.TRAIN_PATH_TO_GROUNDTRUTH = self.BASE_DIR + 'data/training_extension_full/groundtruth'
+
+            self.VALID_PATH_TO_DATA = self.BASE_DIR + 'data/validation_extension_full/images'
+            self.VALID_PATH_TO_GROUNDTRUTH = self.BASE_DIR + 'data/validation_extension_full/groundtruth'
+            self.VALID_PATH_TO_ARRAYS = self.BASE_DIR + 'data/validation_extension_full/arrays/'
+
+
 
     BASE_DIR = './../'
 
@@ -142,19 +153,19 @@ class AbstractConfig(ABC):
                      |_|                                  |___/
 
     '''
-    
+
     POST_DO_CRFPROCESSING = True
 
     POST_WRITE_SUBMISSION = True
-    #POST_MAX_NUM_IMAGES_TOPROCESS = 5
+
     POST_MAX_NUM_IMAGES_TOPROCESS = sys.maxsize
-    
+
     POST_NUM_INFERENCE_IT = 25
-    
+
     POST_SDIMS_GAUSSIAN_X = 0.05
     POST_SDIMS_GAUSSIAN_Y = 0.05
     POST_COMPAT_GAUSSIAN = 15
-    
+
     POST_SDIMS_BILATERAL_X = 120
     POST_SDIMS_BILATERAL_Y = 120
     POST_SCHAN_BILATERAL_R = 40

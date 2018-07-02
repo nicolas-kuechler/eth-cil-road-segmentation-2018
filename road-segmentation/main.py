@@ -17,24 +17,15 @@ data = parser.args.data
 model_module = importlib.import_module('models.' + model_name + ".model")
 Model = model_module.Model
 
-
-
 config_module = importlib.import_module('models.' + model_name + ".config")
 Config = config_module.Config
 
-ext = data == 'ext'
-if ext:
-    model_name = model_name + '_ext'
-
-config = Config(model_name, ext)
+model_name = model_name + '_' + data
+config = Config(model_name, data)
 
 print('Setting Output Directory: ', config.OUTPUT_DIR)
 
 print('Loading Model: ', config.MODEL_NAME)
-
-# TODO [nku] create and set output folder in config if not there yet (in models/model_name/output)
-
-# TODO [nku] export the config to some json file
 
 print('\nCreating Dataset...')
 dataset = Dataset(config)

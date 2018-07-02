@@ -11,7 +11,6 @@ class Model(AbstractModel):
         self.images = self.dataset.img_batch
         self.labels = tf.cast(self.dataset.labels, tf.float32)
 
-        # Build Neural Network Architecture (here single convolution layer)
         input = tf.cast(self.images, tf.float32)
 
         with tf.variable_scope('encoding'):

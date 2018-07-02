@@ -1,0 +1,4 @@
+model_checkpoint_path: "example_ext-half-7"
+all_model_checkpoint_paths: "example_ext-half-3"
+all_model_checkpoint_paths: "example_ext-half-5"
+all_model_checkpoint_paths: "example_ext-half-7"

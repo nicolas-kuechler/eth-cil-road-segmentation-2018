@@ -13,23 +13,16 @@ class Config(AbstractConfig):
     VALID_METHOD_STRIDE = 72
     VALID_N_PATCHES_PER_IMAGE = (400 - VALID_METHOD_PATCH_SIZE)/ VALID_METHOD_STRIDE + 1
 
-    SUB_WRITE_INDIVIDUAL_PREDICTIONS = True
-
-    # TEST_N_PATCHES_PER_IMAGE = (608 - TEST_METHOD_PATCH_SIZE)/ TEST_METHOD_STRIDE + 1
-
     # Define new Configurations for your Model
-    #TEST_METHOD_PATCH_SIZE = [128, 160, 256, 608]
-    #TEST_METHOD_STRIDE = [60, 112, 88, 608]
     TEST_METHOD_PATCH_SIZE = [256, 608]
     TEST_METHOD_STRIDE = [88, 608]
     TEST_ROTATION_DEGREE = [0, 90, 180, 270]
 
-
-    N_EPOCHS = 50
+    N_EPOCHS = 75
     N_BATCHES_PER_EPOCH = 1000
     TRAIN_BATCH_SIZE = 4
 
-    LEARNING_RATE = 0.01
+    LEARNING_RATE = 0.005
 
     LEARNING_RATE_TYPE = 'exponential'
     LEARNING_RATE_DECAY_RATE = 0.95
@@ -50,5 +43,3 @@ class Config(AbstractConfig):
 
     AUG_COLOR_PCA_PROB = 0.5
     AUG_COLOR_PCA_SIGMA = 0.1
-
-    # Define new Configurations for your Model
