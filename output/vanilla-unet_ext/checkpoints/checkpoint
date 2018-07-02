@@ -1,4 +1,2 @@
 model_checkpoint_path: "vanilla-unet_ext-50001"
-all_model_checkpoint_paths: "vanilla-unet_ext-41001"
-all_model_checkpoint_paths: "vanilla-unet_ext-45001"
 all_model_checkpoint_paths: "vanilla-unet_ext-50001"

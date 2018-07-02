@@ -1,1 +1,0 @@
-take the vanilla unet ext output and classifiy all pixels with prediction >0.5 as road=1 and the others as background=0
