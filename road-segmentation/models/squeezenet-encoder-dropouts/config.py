@@ -7,7 +7,7 @@ class Config(AbstractConfig):
 
 
     # Overwrite any Configurations from Abstract Config
-    N_EPOCHS = 40
+    N_EPOCHS = 45
     N_BATCHES_PER_EPOCH = 100
     LEARNING_RATE = 0.0001
     TRAIN_METHOD_NAME = 'full' # patch or full
