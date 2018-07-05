@@ -24,7 +24,7 @@ Where `model_name` is the desired model to use in road-segmentation/models/{mode
 
 `mode` can be either **train** or **test**. The latter generates the predictions for the test images.
 
-`dataset` can be **default** for the originally provided dataset. **ext-half** for using the default + half the additional dataset or *ext-full*
+`dataset` can be **default** for the originally provided dataset. **ext-half** for using the default + half the additional dataset or **ext-full**
 for the complete additional dataset.
 
 This will generate the model's files corresponding the selected mode in output/{model_name}_{dataset}.
