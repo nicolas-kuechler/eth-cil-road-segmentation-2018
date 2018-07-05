@@ -2,6 +2,19 @@ import os
 from PIL import Image
 import argparse
 import numpy as np
+'''
+    Used to compare the outputs of two trained models. It is required that
+    the command main.py model_name test dataset has been run before as
+    the overlay images will be used.
+    
+    Usage:
+        compare.py model_folder1 model_folder2
+        
+    The first model will be represented with a blue mask while the second one will have a yellow one.
+    Matching areas will be green.
+'''
+
+
 
 # assign a label to a patch
 def patch_to_label(patch):
@@ -70,8 +83,3 @@ for im1, im2, o in zip(images1, images2, originals):
     blended = Image.blend(im1, im2, 0.5)
     blended = Image.blend(o, blended, 0.5)
     blended.save(f'comparisons/comp_{id}.png')
-
-
-
-
-print('aa')
