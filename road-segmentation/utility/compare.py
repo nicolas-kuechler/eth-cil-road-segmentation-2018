@@ -2,6 +2,8 @@ import os
 from PIL import Image
 import argparse
 import numpy as np
+from os import path
+
 '''
     Used to compare the outputs of two trained models. It is required that
     the command main.py model_name test dataset has been run before as
@@ -41,7 +43,7 @@ def __build_masks(db):
 
 
 
-output_dir = 'output/'
+output_dir = '../../output/'
 
 parser = argparse.ArgumentParser(description='Comparison script')
 parser.add_argument('dir1', metavar='Model 1', type=str,
@@ -52,22 +54,21 @@ parser.add_argument('dir2', metavar='Model 2', type=str,
 
 args = parser.parse_args()
 
+args.dir1 = path.join(args.dir1, 'test_output', 'masks')
+args.dir2 = path.join(args.dir2, 'test_output', 'masks')
 images1 = os.listdir(args.dir1)
 images2 = os.listdir(args.dir2)
-originals = os.listdir('data/test_images')
+originals = os.listdir('../../data/test_images')
 
 # create directory if it doesn't exist
-if not os.path.exists('comparisons'):
-    os.makedirs('comparisons')
-
-db1 = {}
-db2 = {}
+if not os.path.exists('../../comparisons'):
+    os.makedirs('../../comparisons')
 
 for im1, im2, o in zip(images1, images2, originals):
     id = im1.split('_')[1].split('.')[0]
     im1 = Image.open(args.dir1 + '/' + im1)
     im2 = Image.open(args.dir2 + '/' + im2)
-    o = Image.open('data/test_images/' + o)
+    o = Image.open('../../data/test_images/' + o)
     im1 = im1.convert('RGBA')
     im2 = im2.convert('RGBA')
     o = o.convert('RGBA')
@@ -82,4 +83,4 @@ for im1, im2, o in zip(images1, images2, originals):
 
     blended = Image.blend(im1, im2, 0.5)
     blended = Image.blend(o, blended, 0.5)
-    blended.save(f'comparisons/comp_{id}.png')
+    blended.save(f'../../comparisons/comp_{id}.png')
