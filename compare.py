@@ -71,29 +71,6 @@ for im1, im2, o in zip(images1, images2, originals):
     blended = Image.blend(o, blended, 0.5)
     blended.save(f'comparisons/comp_{id}.png')
 
-# for im1, im2 in zip(images1, images2):
-#     patch_size = 16
-#     im1_id = im1.split('_')[1].split('.')[0]
-#     im2_id = im2.split('_')[1].split('.')[0]
-#
-#     im1 = Image.open(args.dir1 + '/' + im1)
-#     im2 = Image.open(args.dir2 + '/' + im2)
-#
-#     im1 = np.array(im1)/255
-#     im2 = np.array(im2)/255
-#
-#     for j in range(0, im1.shape[1], patch_size):
-#         for i in range(0, im1.shape[0], patch_size):
-#             patch1 = im1[i: i + patch_size, j: j + patch_size]
-#             patch2 = im2[i: i + patch_size, j: j + patch_size]
-#             label1 = patch_to_label(patch1)
-#             label2 = patch_to_label(patch2)
-#             db1[im1_id, j, i] = label1
-#             db2[im2_id, j, i] = label2
-
-#masks1 = __build_masks(db1)
-#masks2 = __build_masks(db2)
-
 
 
 
