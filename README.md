@@ -4,13 +4,6 @@ Segmenting an image consists in partitioning an image into multiple segments (fo
 
 For this problem, we provide a set of satellite/aerial images acquired from GoogleMaps. We also provide ground-truth images where each pixel is labeled as {road, background}. Your goal is to train a classifier to segment roads in these images, i.e. assign a label {road=1, background=0} to each pixel.
 
-## Useful Links
-* [Trello Board](https://trello.com/b/D4NLabKT/cil)
-* [Paper](https://v2.overleaf.com/7312313351mjgnqnjnsncf)
-* [Kaggle](https://www.kaggle.com/c/cil-road-segmentation-2018)
-* [Leonhard Wiki](https://scicomp.ethz.ch/wiki/Getting_started_with_clusters)
-* [Tensorflow Doc](https://www.tensorflow.org/api_docs/python/)
-
 ## Getting started
 
 #### Requirements
