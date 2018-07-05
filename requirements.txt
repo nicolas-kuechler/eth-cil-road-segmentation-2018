@@ -1,3 +1,4 @@
+tensorflow==1.8
 numpy==1.14.5
 augmentor==0.2.2
 scipy==1.1
