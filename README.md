@@ -42,7 +42,7 @@ Where `model_name_folder` is the desired model to use from output/{model_name}_{
 
 `config_name` is one of the already defined 9 configurations road_segmentation/postprocessing/pp_config_{config_name}. The recommended option is p1.
 
-This will generate folder with the corresponding files in output/{model_name}_{dataset}_{postprocessing_config}.
+This will generate folder with the corresponding files in output/{model_name}_{dataset}_{config_name}.
 
 #### Averaging models
 
