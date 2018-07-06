@@ -5,6 +5,12 @@ import matplotlib.pyplot as plt
 import os,sys
 from PIL import Image
 
+"""
+    This baseline is not run the same way the other models are run.
+    To execute the code run the following command
+        python baseline1_traditional.py
+    This will generate a submission file at the same level of this file.
+"""
 
 if __name__ == '__main__':
     # Helper functions
@@ -51,19 +57,21 @@ if __name__ == '__main__':
 
 
     # Loaded a set of images
-    root_dir = "training/"
+    root_dir = "../../.."
+    data_dir = os.path.join(root_dir, 'data')
 
-    image_dir = root_dir + "images/"
-    test_files = os.listdir('test_images')
+    image_dir = os.path.join(data_dir, "training/images")
+    test_files_dir = os.path.join(data_dir, 'test_images')
+    test_files = os.listdir(test_files_dir)
     files = os.listdir(image_dir)
     n = len(files) # Load maximum 20 images
     print("Loading " + str(n) + " images")
-    imgs = [load_image(image_dir + files[i]) for i in range(n)]
+    imgs = [load_image(os.path.join(image_dir, files[i])) for i in range(n) if files[i].endswith('.png')]
     print(files[0])
 
-    gt_dir = root_dir + "groundtruth/"
+    gt_dir = os.path.join(data_dir,  "training/groundtruth")
     print("Loading " + str(n) + " images")
-    gt_imgs = [load_image(gt_dir + files[i]) for i in range(n)]
+    gt_imgs = [load_image(os.path.join(gt_dir, files[i])) for i in range(n) if files[i].endswith('.png')]
     print(files[0])
 
     n = 10 # Only use 10 images for training
@@ -207,7 +215,7 @@ if __name__ == '__main__':
 
     for id in ids:
     #for path in files:
-        Xi = extract_img_features(f'test_images/test_{id}.png')
+        Xi = extract_img_features(f'{test_files_dir}/test_{id}.png')
         Zi = logreg.predict(Xi)
         plt.scatter(Xi[:, 0], Xi[:, 1], c=Zi, edgecolors='k', cmap=plt.cm.Paired)
         prediction_to_file(id, Zi, submission_file)
