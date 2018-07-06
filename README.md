@@ -71,7 +71,7 @@ on the Leonhard cluster using the following configurations
 bsub -n 10 -q "gpu.24h" -R "rusage[mem=10000,ngpus_excl_p=1]" COMMAND
 ```
 
-Run the following commands to **exactly** reproduce the results (as on Kaggle), using the already trained models:
+Run the following commands to **exactly** reproduce the results (as on Kaggle), using the provided trained models:
 
 ```
 # We need to be at the road-segmentation level
