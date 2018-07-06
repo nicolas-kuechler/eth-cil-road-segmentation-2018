@@ -1,3 +1,4 @@
+# Config module of parameter set 2
 from core.abstract_config import AbstractConfig
 
 class Config(AbstractConfig):

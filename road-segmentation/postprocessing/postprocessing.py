@@ -1,3 +1,4 @@
+# Module which contains the functions used for post-processing
 import sys
 path = "/home/dpakhom1/dense_crf_python/"
 sys.path.append(path)
@@ -50,4 +51,3 @@ class Postprocessing():
         #processed_prediction = new_prediction[0].reshape((image.shape[0], image.shape[1]))
         
         return processed_prediction
-        

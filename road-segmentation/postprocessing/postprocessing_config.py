@@ -9,7 +9,7 @@ class Config(AbstractConfig):
         self.POST_PREDICTIONS_IN_DIR = self.BASE_DIR + 'output/' + batch_name + '/test_output/predictions/'
         self.TEST_IMAGES_IN_DIR = './../data/test_images/'
         
-        self.OUTPUT_DIR = self.BASE_DIR + 'output/' + batch_name + '_post/'
+        self.OUTPUT_DIR = self.BASE_DIR + 'output/' + batch_name + '_post/test_output'
                 
 		# Overwrite any Configurations from Abstract Config
         self.TEST_OUTPUT_DIR = self.OUTPUT_DIR

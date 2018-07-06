@@ -1,3 +1,4 @@
+# Config file for the script average.py (used to create a submission)
 from core.abstract_config import AbstractConfig
 
 class Config(AbstractConfig):
