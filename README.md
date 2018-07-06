@@ -1,4 +1,5 @@
-# CIL - Road Segmentation - 2018
+# CIL Semester Project: Road Segmentation
+
 
 Segmenting an image consists in partitioning an image into multiple segments (formally one has to assign a class label to each pixel). A simple baseline is to partition an image into a set of patches and classify every patch according to some simple features (average intensity). Although this can produce reasonable results for simple images, natural images typically require more complex procedures that reason abut the entire image or very large windows.
 
@@ -64,8 +65,8 @@ This will generate a folder in output/{model_folder1}--{model_folder2}--avg.
 
 #### Reproducing Kaggle results
 
-As the evaluation process might long, we recommend running the following commands
-on the Leonhard cluster using the following configurations
+As the training and also the evaluation process takes a long time, we recommend running the following commands
+on the Leonhard cluster using the following configurations:
 
 ```
 bsub -n 10 -q "gpu.24h" -R "rusage[mem=10000,ngpus_excl_p=1]" COMMAND
@@ -120,3 +121,9 @@ python main_postprocessing.py squeezenet-encoder-dropouts_ext-half p1
 python average.py squeezenet-encoder-dropouts_ext-half_post_p1 vanilla-unet_ext-full_post_p1
 ```
 Or run the `create_submission.sh` file.
+
+## Authors
+
+* **Sabina Fischlin** - [inafischlin](https://gitlab.com/inafischlin)
+* **Octavio Martínez** - [octmb](https://gitlab.com/octmb)
+* **Nicolas Küchler** - [nicolas-kuechler](https://gitlab.com/nicolas-kuechler)
