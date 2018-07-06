@@ -16,7 +16,7 @@ pip install -r requirements.txt
 ```
 
 Please make sure that the data folder contains the required images for training and testing. Otherwise it is possbile to download them from this repository or 
-from this link in [polybox](https://polybox.ethz.ch/index.php/s/TrQJKnHl6qQ7UdE)
+from this link on [polybox](https://polybox.ethz.ch/index.php/s/TrQJKnHl6qQ7UdE)
 
 #### Running a model
 
