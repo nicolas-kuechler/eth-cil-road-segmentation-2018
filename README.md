@@ -58,7 +58,25 @@ This will generate a folder in output/{model_folder1}--{model_folder2}--avg.
 
 #### Reproducing Kaggle results
 
-Run the following commands:
+Run the following commands to **exactly** reproduce the results (as on Kaggle), using the already trained models:
+
+```
+# vanilla-unet
+python main.py vanilla-unet test ext-full
+python main_postprocessing.py vanilla-unet_ext-full p1
+
+
+# squeezenet-encoder
+python main.py squeezenet-encoder-dropouts test ext-half
+python main_postprocessing.py squeezenet-encoder-dropouts_ext-half p1
+
+# average
+python average.py squeezenet-encoder-dropouts_ext-half_post_p1 vanilla-unet_ext-full_post_p1
+```
+Or run the `create_exact_submission.sh` file.
+
+
+Run the following commands to reproduce the results by training the models:
 
 ```
 # vanilla-unet
