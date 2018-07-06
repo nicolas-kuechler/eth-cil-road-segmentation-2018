@@ -3,6 +3,14 @@ import tensorflow as tf
 import numpy as np
 
 class AbstractModel(ABC):
+    """
+    Every model must inherit this class which provides the shared functionality
+
+    Overview:
+    initializes global step counter, epoch counter, learning rate, gradient clipping,
+    functionality to save and load a model, different metrics and tensorboard summaries
+    """
+
     def __init__(self, config, dataset, mode):
         self.config = config
         self.dataset = dataset
@@ -52,7 +60,9 @@ class AbstractModel(ABC):
         self.saver = tf.train.Saver(max_to_keep=self.config.MAX_CHECKPOINTS_TO_KEEP)
 
     def init_learning_rate(self):
-        # configure learning rate
+        """
+        configure the learning rate according to the config
+        """
         if self.config.LEARNING_RATE_TYPE == 'exponential':
             self.lr = tf.train.exponential_decay(self.config.LEARNING_RATE,
                                             global_step=self.global_step,
@@ -71,12 +81,23 @@ class AbstractModel(ABC):
 
 
     def build_placeholder(self):
+        """
+        builds the placeholder that by default use the dataset, allow however
+        also to directly feed images, labels and predictions
+        (this is necessary for the patch based validation where we want to calculate
+        all the metrics also on the merged images)
+        """
         self.images_pl = tf.placeholder_with_default(input=self.images, shape=[None, None, None, 3], name='images_pl')
         self.labels_pl = tf.placeholder_with_default(input=self.labels, shape=[None, None, None, 1], name='labels_pl')
         self.predictions_pl = tf.placeholder_with_default(input=self.predictions, shape=[None, None, None, 1] , name='predictions_pl')
         self.rmse_valid_pl = tf.placeholder(tf.float32, name='rmse_valid_pl')
 
     def build_metrics(self):
+        """
+        build precision, recall and f1 score metrics at different thresholds
+        (at what kind of threshold value is a pixel considered to be a road)
+        and also build the mean squared error metric
+        """
         # Define the metric and update operations
         self.thresholds = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
         self.precision, self.precision_update = tf.metrics.precision_at_thresholds(labels=self.labels_pl, predictions=self.predictions_pl, thresholds=self.thresholds, name='precision')
@@ -84,7 +105,6 @@ class AbstractModel(ABC):
 
         self.f1 = tf.div(tf.multiply(self.precision, self.recall), tf.add(self.precision, self.recall))
         self.mse = tf.losses.mean_squared_error(labels=self.labels_pl, predictions=self.predictions_pl)
-
 
         # Isolate the variables stored behind the scenes by the metric operation
         precision_running_vars = tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope="precision")
@@ -95,9 +115,11 @@ class AbstractModel(ABC):
         self.recall_running_vars_initializer = tf.variables_initializer(var_list=recall_running_vars)
 
 
-
-
     def build_summaries(self):
+        """
+        builds the tensorboard summaries for training and validation
+        """
+
         with tf.name_scope('summaries'):
             tf.summary.scalar('loss', self.loss, family='01_general', collections=['train_img','train'])
             tf.summary.scalar('mean_squarred_error', self.mse, family='01_general', collections=['train_img','train', 'valid'])

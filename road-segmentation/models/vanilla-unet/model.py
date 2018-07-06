@@ -4,12 +4,19 @@ from core.abstract_model import AbstractModel
 
 class Model(AbstractModel):
 
+    """
+    UNet Model Implementation
+    """
+
     def __init__(self, config, dataset, mode):
         self.is_training = mode == 'train'
         super().__init__(config, dataset, mode)
 
 
     def build_model(self):
+        """
+        build the model by putting together the encoder part with the bridge and the decoder
+        """
         self.images = self.dataset.img_batch
         self.labels = tf.cast(self.dataset.labels, tf.float32)
 
@@ -28,6 +35,9 @@ class Model(AbstractModel):
 
 
     def encoder(self, input):
+        """
+        build the encoder part of the network
+        """
         skip = {}
 
         with tf.name_scope(name='level_1'):
@@ -55,6 +65,9 @@ class Model(AbstractModel):
         return output, skip
 
     def decoder(self, input, skip):
+        """
+        build the decoder part of the network by also connecting the skip connections
+        """
 
         with tf.name_scope(name='bridge'):
             path = self.bn_conv_relu(input, filters=64, name='bn_conv_relu_bridge_1')
@@ -82,6 +95,9 @@ class Model(AbstractModel):
         return output
 
     def encoder_block(self, input, id):
+        """
+        build an encoder block
+        """
         path = self.bn_conv_relu(input, filters=64, name='bn_conv_relu_' + id + '.1')
         path = self.bn_conv_relu(path, filters=64, name='bn_conv_relu_' + id + '.2')
         skip = path
@@ -90,6 +106,9 @@ class Model(AbstractModel):
         return output, skip
 
     def decoder_block(self, input, skip, id):
+        """
+        build a decoder block
+        """
         path = tf.concat([input, skip], axis=3)
         path = self.bn_conv_relu(path, filters=96, name='bn_conv_relu_' + id + '.2')
         path = self.bn_conv_relu(path, filters=64, name='bn_conv_relu_' + id + '.3')

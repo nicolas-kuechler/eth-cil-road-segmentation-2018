@@ -8,6 +8,11 @@ from utility import util
 
 class Evaluation():
 
+    """
+    runs the evaluation on the test set with the given trained model
+    according to the configuration
+    """
+
     def __init__(self, sess, config, model):
         self.sess = sess
         self.config = config
@@ -16,6 +21,11 @@ class Evaluation():
         self.model.load(self.sess) # load the model
 
     def eval(self):
+        """
+        loop over the complete test dataset and feed it to the network to get
+        the predictions. Then in case of a patch based approach merge the patch
+        predictions back together and return a prediction dictionary
+        """
         print('\nStarting Evaluation...')
         self.sess.run(self.model.dataset.init_op_test) # switch to test dataset
 
@@ -58,7 +68,7 @@ class Evaluation():
             for i in range(n_images):
                 start = i * n_patches_per_image
                 end = start + n_patches_per_image
-
+                # merge patches back together
                 img = isam.merge_into_image_from_flatten(patches_flatten=predictions[start:end, : ,: , :],
                                                 index=ids[start:end, :],
                                                 image_size=(self.config.TEST_IMAGE_SIZE, self.config.TEST_IMAGE_SIZE, 1),
@@ -87,6 +97,12 @@ class Evaluation():
         return pred_dict
 
     def invert_augmentation(self, img):
+        """
+        inverts the augmentation on the predictions
+        (e.g. if image was rotated by 90 degrees and then fed to the network
+        then here the prediction is rotated by -90 degrees to get the prediction
+        of the actual test image)
+        """
         if self.config.TEST_ROTATION_DEGREE is not 0:
             img = util.to_image(img)
             img = img.rotate(-1 * self.config.TEST_ROTATION_DEGREE, expand=False, resample=Image.BICUBIC)

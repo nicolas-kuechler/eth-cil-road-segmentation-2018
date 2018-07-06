@@ -7,6 +7,15 @@ from utility import image_split_and_merge as isam
 
 class Dataset():
 
+    """
+    sets up the three datasets (training, validation, test) and creates
+    an iterator that can directly be used within the model to feed the data.
+    to switch between the datasets, there are three initializers
+
+    for more info on this see the tensorflow docs:
+    https://www.tensorflow.org/api_docs/python/tf/data/Dataset
+    """
+
     OUTPUT_TYPE = tf.uint8
 
     def __init__(self, config):
@@ -31,11 +40,16 @@ class Dataset():
 
 
     def pre_process(self):
+        """
+        no other preprocessing here
+        """
         pass
 
 
     def build_ds_train(self):
-
+        """
+        build the training dataset using Augmentor with a generator
+        """
         p = self.build_augmentation_pipeline(path_to_data=self.config.TRAIN_PATH_TO_DATA,
                                                 path_to_groundtruth=self.config.TRAIN_PATH_TO_GROUNDTRUTH,
                                                 seed=self.config.TRAIN_SEED)
@@ -53,6 +67,9 @@ class Dataset():
         return ds
 
     def build_ds_valid(self):
+        """
+        build the validation dataset with a generator
+        """
         ds = tf.data.Dataset.from_generator(
                 lambda: self.tf_generator(image_dir=self.config.VALID_PATH_TO_DATA,
                                             method_name=self.config.VALID_METHOD_NAME,
@@ -66,6 +83,9 @@ class Dataset():
 
 
     def build_ds_test(self):
+        """
+        build the test dataset with a generator
+        """
         ds = tf.data.Dataset.from_generator(
                 lambda: self.tf_generator(image_dir=self.config.TEST_PATH_TO_DATA,
                                             method_name=self.config.TEST_METHOD_NAME,
@@ -78,6 +98,13 @@ class Dataset():
 
 
     def tf_generator(self, image_dir:str, method_name:str, patch_size=None, stride=None, gt_dir=None, gt_foreground_threshold=None, rotation=None):
+        """
+        generator function that loads image and gt from the file system,
+        processes the groundtruth such that each pixel is either 0 or 1,
+        in case of a patch based approach splits the images and gts into patches
+        and rotates the image according to the given rotation
+        """
+
         for filename in os.listdir(image_dir):
             # load image and gt
             img = Image.open(image_dir + '/' + filename)
@@ -106,10 +133,11 @@ class Dataset():
                 gt = np.where(gt>gt_foreground_threshold, 1, 0)
 
             if method_name == 'patch':
+                # split image into patches
                 img_patches = isam.split_into_patches(image=img, patch_size=(patch_size,  patch_size, 3), stride=stride)
                 img_patches_flatten, ids = isam.flatten_patches(img_patches, id)
 
-                if gt_dir is not None:
+                if gt_dir is not None: # split gt into patches
                     gt_patches = isam.split_into_patches(image=gt, patch_size=(patch_size, patch_size, 1), stride=stride)
                     gt_patches_flatten, _ = isam.flatten_patches(gt_patches, id)
                 else:
@@ -124,6 +152,11 @@ class Dataset():
 
 
     def build_augmentation_pipeline(self, path_to_data: str, path_to_groundtruth:str , seed = None):
+        """
+        builds the augmentation pipeline by adding the different operations
+        according to the config file
+        """
+
         # Create a pipeline
         p = CustomPipeline(source_directory=path_to_data, gt_foreground_threshold=self.config.GT_FOREGROUND_THRESHOLD)
         p.ground_truth(path_to_groundtruth)
@@ -215,13 +248,19 @@ class Dataset():
 
 
 class CustomPipeline(Augmentor.Pipeline):
+    """
+    Extension of Augmentor.Pipeline that provides a generator for tensorflow
+    """
     def __init__(self, source_directory, gt_foreground_threshold, output_directory='output', save_format=None):
         self.gt_foreground_threshold = gt_foreground_threshold
         Augmentor.Pipeline.__init__(self, source_directory, output_directory, save_format)
 
     def tf_generator(self):
+        """
+        randomly select images for the augmentation and then yield the augmented images
+        """
+
         while True:
-            # Randomly select images for augmentation and yield the augmented images.
 
             # select random image
             random_image_index = random.randint(0, len(self.augmentor_images)-1)
@@ -251,6 +290,9 @@ class CustomPipeline(Augmentor.Pipeline):
 
 
     def _tf_execute(self, augmentor_image):
+        """
+        apply each operation to the image with the specified probability
+        """
         images = []
 
         if augmentor_image.image_path is not None:
@@ -267,8 +309,12 @@ class CustomPipeline(Augmentor.Pipeline):
         return images
 
 
-# Custom Operation that performs ColorPCA as described in the AlexNet paper
 class ColorPCA(Augmentor.Operations.Operation):
+    """
+    Custom Operation that performs ColorPCA as described in the AlexNet paper
+    for more details see p.5-6 in the paper:
+    https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf
+    """
 
     def __init__(self, probability, evecs, evals, mu, sigma):
         Augmentor.Operations.Operation.__init__(self, probability)
@@ -300,6 +346,11 @@ class ColorPCA(Augmentor.Operations.Operation):
         return augmented_images
 
 class StreetBrightnessAugmentation(Augmentor.Operations.Operation):
+    """
+    Custom Operation that adjusts the brightness of the street slightly
+    to simulate other concrete colors
+    """
+
 
     def __init__(self, probability, min_brightness_change: int, max_brightness_change: int, fg_threshold: int):
         Augmentor.Operations.Operation.__init__(self, probability)

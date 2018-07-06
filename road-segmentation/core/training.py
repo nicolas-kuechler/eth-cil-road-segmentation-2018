@@ -5,6 +5,9 @@ from utility import image_split_and_merge as isam
 from PIL import Image
 
 class Training():
+    """
+    Class to run the training of the model according to the given configuration
+    """
 
     def __init__(self, sess, config, model):
         self.sess = sess
@@ -20,7 +23,17 @@ class Training():
         self.summary_writer_valid = tf.summary.FileWriter(self.config.SUMMARY_VALID_DIR, self.sess.graph)
 
     def train(self):
+        """
+        Run the training by looping over several epochs according to the config.
+        In each epoch we perform multiple train steps training the network with
+        a batch of training images. Followed by a pass through the complete
+        validation set. Both results are written to a summary for tensorboard.
 
+        Since by using the augmentation pipeline there is not a clear full pass
+        through the complete training dataset, the number of training steps
+        within an epoch is controlled by a config param: N_BATCHES_PER_EPOCH.
+        """
+        # loop over epochs
         for epoch in range(self.sess.run(self.model.epoch), self.config.N_EPOCHS):
             print('Start Epoch: ', epoch)
 
@@ -28,6 +41,7 @@ class Training():
             train_init = tf.group(self.model.dataset.init_op_train, self.model.precision_running_vars_initializer, self.model.recall_running_vars_initializer)
             self.sess.run(train_init) # switch to training dataset and reset the accuracy/precision/recall vars
 
+            # loop over batches
             for i in tqdm(range(self.config.N_BATCHES_PER_EPOCH)):
                 step = tf.train.global_step(self.sess, self.model.global_step)
 
@@ -83,6 +97,12 @@ class Training():
         self.model.save(self.sess) # save the model after training
 
     def validate_full(self, step):
+        """ Run the validation with full images as input (not patch based).
+            Loop through the entire validation dataset and calculate metrics:
+            root mean squared error, precision, recall, f1 score.
+            Write the predictions along with the input images and the groundtruth
+            as a summary to tensorboard
+        """
         mses = []
         while True:
             try:
@@ -105,6 +125,16 @@ class Training():
         return rmse
 
     def validate_patch(self, step):
+        """ Run the validation with the patch based approach.
+            Loop through the entire validation dataset which is split up into
+            overlapping patches.
+            Merge the predictions for the patches back into the complete images
+            to allow for a fair comparison between the two different approaches
+            and calculate metrics: rmse, precision, recall, f1 score.
+            Write the predictions along with the input images and the groundtruth
+            as a summary to tensorboard
+        """
+
         predictions = []
         ids = []
         while True:
@@ -128,14 +158,15 @@ class Training():
         n_patches_per_image = int(self.config.VALID_N_PATCHES_PER_IMAGE**2)
         n_images = int(predictions.shape[0] / n_patches_per_image)
 
-        # load validation images and gt arrays
-
+        # to avoid repeated loading of the full images and gt arrays
+        # they are together stored in two .npy files and loaded here
         try:
             images = np.load(self.config.VALID_PATH_TO_ARRAYS + 'images.npy')
             gts = np.load(self.config.VALID_PATH_TO_ARRAYS + 'gts.npy')
             arrays_loaded = True
             print('Image and GT array succesfully loaded')
         except IOError:
+            # the files don't exist yet and have to be created
             arrays_loaded = False
             print('Failed to load Image and/or GT array and hence will create them')
             images = []

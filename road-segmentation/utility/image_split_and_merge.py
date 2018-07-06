@@ -5,6 +5,9 @@ from typing import Tuple
 from operator import itemgetter
 
 def split_into_patches(image: np.ndarray, patch_size: Tuple[int, int, int], stride: int = 1):
+    """
+    splits a given image into possibly overlapping (controlled by stride) patches of size (patch_size x patch_size)
+    """
     assert(len(patch_size)==3), "patch_size needs 3 elements"
 
     # check that patch dim and stride allow to evenly divide image into patches
@@ -18,6 +21,10 @@ def split_into_patches(image: np.ndarray, patch_size: Tuple[int, int, int], stri
     return skimage.util.view_as_windows(image, patch_size, stride)
 
 def merge_into_image(patches: np.ndarray, image_size: Tuple[int, int, int], stride: int = 1):
+    """
+    merges the patches split by the method: split_into_patches() back together into an image
+    and averages in overlapping regions
+    """
     assert(len(image_size)==3), "image_size needs 3 elements"
 
     rows, cols, _ , patch_h, patch_w, _ = patches.shape
@@ -41,6 +48,9 @@ def merge_into_image(patches: np.ndarray, image_size: Tuple[int, int, int], stri
 
 
 def flatten_patches(patches: np.ndarray, id: str):
+    """
+    flattens the image patches produced by the method: split_into_patches()
+    """
     rows, cols, _ , patch_h, patch_w, c = patches.shape
     patches_flatten =  patches.reshape(rows * cols, patch_h, patch_w, c)
 
@@ -52,6 +62,10 @@ def flatten_patches(patches: np.ndarray, id: str):
     return patches_flatten, index
 
 def merge_into_image_from_flatten(patches_flatten: np.ndarray, index: np.ndarray, image_size: Tuple[int, int, int], stride: int = 1):
+    """
+    merges flattened image patches back together into an image
+    """
+
     assert(len(image_size)==3), "image_size needs 3 elements"
 
     _, patch_h, patch_w, _ = patches_flatten.shape
@@ -88,6 +102,9 @@ def merge_into_image_from_flatten(patches_flatten: np.ndarray, index: np.ndarray
     return avg_image
 
 def test():
+    """
+    test method for the splitting and merging of patches
+    """
 
     print("Load Image and Groundtruth")
     image_dir = "./../../data/training/images/"
@@ -112,9 +129,6 @@ def test():
 
     print('img_patches_flatten: ', img_patches_flatten.shape)
     print('gt_patches_flatten: ', gt_patches_flatten.shape)
-
-    # del img_idx[9:11] # check that missing patches detection works
-    # img_idx[5][0] = 11 # check that double image detection works
 
     print("\nMerge Patches into Image and GT:")
     img_merged = merge_into_image(patches=img_patches, image_size=(img.shape[0], img.shape[1], img.shape[2]), stride=stride)

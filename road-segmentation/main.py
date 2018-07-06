@@ -8,6 +8,11 @@ from core.submission import Submission
 import utility.parser as parser
 from utility import util
 
+"""
+main method to either: (controlled by arg)
+- run the training of the model (given as arg) on the dataset (given as arg)
+- run the test of the model (given as arg) on the test set
+"""
 
 # Parse Argument to Load Model and Config
 model_name = parser.args.model_name
@@ -24,7 +29,6 @@ model_name = model_name + '_' + data
 config = Config(model_name, data)
 
 print('Setting Output Directory: ', config.OUTPUT_DIR)
-
 print('Loading Model: ', config.MODEL_NAME)
 
 print('\nCreating Dataset...')
@@ -34,7 +38,6 @@ print('Dataset Created')
 print('\nCreating Model...')
 model = Model(config, dataset, mode)
 print('Created Model with {} parameters'.format(model.n_params))
-
 
 if mode == 'train':
     sess = tf.Session()
@@ -50,6 +53,8 @@ elif mode == 'test':
     predictions = []
     infos = []
 
+    # if we use ensemble (perform evaluation on different patch sizes and rotations and then average)
+    # we loop over all these combinations of configurations and run the evaluation
     for patch_size, stride in zip(patch_sizes, strides):
         for rotation in rotations:
             info_str = f'patch_size: {patch_size}, stride: {stride}, rotation: {rotation}'
@@ -69,6 +74,7 @@ elif mode == 'test':
             predictions.append(pred_dict)
             infos.append(info_str)
 
+    # create submission
     submission = Submission(config)
 
     ids = predictions[0].keys()
@@ -76,11 +82,12 @@ elif mode == 'test':
 
     print(f'Start Averaging the {n_pred} Predictions')
 
+    # loop over all test images to average the predictions
     for id in ids:
         avg_prediction = np.zeros((config.TEST_IMAGE_SIZE, config.TEST_IMAGE_SIZE))
         for info, prediction in zip(infos, predictions):
             avg_prediction += prediction[id]
-
+            # option to output non averaged results from ensemble
             if config.SUB_WRITE_INDIVIDUAL_PREDICTIONS:
                 out_dir = config.TEST_OUTPUT_DIR + 'individual_predictions/'
                 if not os.path.exists(out_dir):
@@ -89,9 +96,9 @@ elif mode == 'test':
 
         avg_prediction = avg_prediction / float(len(predictions))
 
-        # could add postprocessing here
         submission.add(prediction=avg_prediction, img_id=id)
 
+    # write the submissions configured in the config file
     submission.write()
 
 else:

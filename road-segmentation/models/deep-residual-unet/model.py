@@ -4,12 +4,19 @@ from core.abstract_model import AbstractModel
 
 class Model(AbstractModel):
 
+    """
+    Deep Residual Unet Implementation (see: https://arxiv.org/pdf/1711.10684.pdf)
+    """
+
     def __init__(self, config, dataset, mode):
         self.is_training = mode == 'train'
         super().__init__(config, dataset, mode)
 
 
     def build_model(self):
+        """
+        build the model by putting together the encoder part with the bridge and the decoder
+        """
         self.images = self.dataset.img_batch
         self.labels = tf.cast(self.dataset.labels, tf.float32)
 
@@ -32,6 +39,9 @@ class Model(AbstractModel):
 
 
     def encoder(self, input):
+        """
+        build the encoder part of the network
+        """
         # Encoding 1
         conv1 = tf.layers.conv2d(input, filters=64, kernel_size=(3, 3), strides=1, padding='same', name='encoding1_conv1')
         bn1 = tf.layers.batch_normalization(conv1, training=self.is_training, name='encoding1_bn1')
@@ -51,10 +61,16 @@ class Model(AbstractModel):
         return encoding1, encoding2, encoding3
 
     def bridge(self, input):
+        """
+        build the bridge of the network
+        """
         return self.res_unit(input, filters=[512,512], strides=[2,1], name='bridge')
 
 
     def decoder(self, input, shortcut1, shortcut2, shortcut3):
+        """
+        build the decoder part of the network
+        """
         ups1 = tf.keras.layers.UpSampling2D(size=(2,2))(input)
         concat1 = tf.concat([shortcut1, ups1], axis=3)
         decoding1 = self.res_unit(concat1, filters=[256,256], strides=[1,1], name='decoding1')
@@ -70,6 +86,9 @@ class Model(AbstractModel):
         return decoding3
 
     def res_unit(self, input, filters, strides, name):
+        """
+        build the residual unit
+        """
 
         bn1_out = tf.layers.batch_normalization(input, training=self.is_training, name=name+'_bn1')
         relu1_out = tf.nn.relu(bn1_out, name=name+'_relu1')
