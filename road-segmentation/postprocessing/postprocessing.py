@@ -47,7 +47,5 @@ class Postprocessing():
         Q = d.inference(self.config.POST_NUM_INFERENCE_IT)
         result = np.argmin(Q, axis=0)
         processed_prediction = result.reshape((image.shape[0], image.shape[1]))
-        #new_prediction = np.array(Q)
-        #processed_prediction = new_prediction[0].reshape((image.shape[0], image.shape[1]))
         
         return processed_prediction
