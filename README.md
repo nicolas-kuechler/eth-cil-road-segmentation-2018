@@ -16,6 +16,8 @@ pip install -r requirements.txt
 
 #### Running a model
 
+The following command should be run at the road-segmentation directory level.
+
 ```
 python main.py model_name mode dataset
 ```
@@ -34,6 +36,8 @@ This will generate the model's files corresponding the selected mode in output/{
 
 #### Postprocessing
 
+The following command should be run at the road-segmentation directory level.
+
 ```
 python main_postprocessing.py model_folder config_name
 ```
@@ -47,6 +51,8 @@ This will generate folder with the corresponding files in output/{model_name_fol
 
 #### Averaging models
 
+The following command should be run at the road-segmentation directory level.
+
 ```
 python average.py model_folder1 model_folder2
 ```
@@ -58,9 +64,31 @@ This will generate a folder in output/{model_folder1}--{model_folder2}--avg.
 
 #### Reproducing Kaggle results
 
-Run the following commands:
+Run the following commands to **exactly** reproduce the results (as on Kaggle), using the already trained models:
 
 ```
+# Assuming you cd to road-segmentation, run the following commands
+
+# vanilla-unet
+python main.py vanilla-unet test ext-full
+python main_postprocessing.py vanilla-unet_ext-full p1
+
+
+# squeezenet-encoder
+python main.py squeezenet-encoder-dropouts test ext-half
+python main_postprocessing.py squeezenet-encoder-dropouts_ext-half p1
+
+# average
+python average.py squeezenet-encoder-dropouts_ext-half_post_p1 vanilla-unet_ext-full_post_p1
+```
+Or run the `create_exact_submission.sh` file.
+
+
+Run the following commands to reproduce the results by training the models:
+
+```
+# Assuming you cd to road-segmentation, run the following commands
+
 # vanilla-unet
 python main.py vanilla-unet train ext-full
 python main.py vanilla-unet test ext-full
