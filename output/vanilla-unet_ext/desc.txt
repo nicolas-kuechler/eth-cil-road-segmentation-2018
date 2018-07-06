@@ -1,3 +1,0 @@
-this has not been uploaded yet to kaggle
-
-plain vanilla unet with extended dataset (not with all of it) but without any pixel thresholding at the end
