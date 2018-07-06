@@ -15,6 +15,8 @@ Using python 3.6 run the following command to install the dependencies
 pip install -r requirements.txt
 ```
 
+Please make sure that the data folder contains the required images for training and testing. Otherwise it is possbile to download them from this repository.
+
 #### Running a model
 
 The following command should be run at the road-segmentation directory level.
