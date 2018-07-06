@@ -88,12 +88,12 @@ Or run the `create_exact_submission.sh` file.
 Run the following commands to reproduce the results by training the models:
 
 ```
+# We need to be at the road-segmentation level
+cd road-segmentation
+
 # We need to remove the previous trained models if any
 rm -r ../output/vanilla-unet_ext-full
 rm -r ../output/squeezenet-encoder-dropouts_ext-half
-
-# We need to be at the road-segmentation level
-cd road-segmentation
 
 # vanilla-unet
 python main.py vanilla-unet train ext-full
