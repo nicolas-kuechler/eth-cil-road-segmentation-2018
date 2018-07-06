@@ -67,7 +67,8 @@ This will generate a folder in output/{model_folder1}--{model_folder2}--avg.
 Run the following commands to **exactly** reproduce the results (as on Kaggle), using the already trained models:
 
 ```
-# Assuming you cd to road-segmentation, run the following commands
+# We need to be at the road-segmentation level
+cd road-segmentation
 
 # vanilla-unet
 python main.py vanilla-unet test ext-full
@@ -87,7 +88,12 @@ Or run the `create_exact_submission.sh` file.
 Run the following commands to reproduce the results by training the models:
 
 ```
-# Assuming you cd to road-segmentation, run the following commands
+# We need to remove the previous trained models if any
+rm -r ../output/vanilla-unet_ext-full
+rm -r ../output/squeezenet-encoder-dropouts_ext-half
+
+# We need to be at the road-segmentation level
+cd road-segmentation
 
 # vanilla-unet
 python main.py vanilla-unet train ext-full
