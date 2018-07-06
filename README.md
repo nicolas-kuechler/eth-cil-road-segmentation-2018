@@ -64,6 +64,13 @@ This will generate a folder in output/{model_folder1}--{model_folder2}--avg.
 
 #### Reproducing Kaggle results
 
+We recommend running the following commands using the Leonhard cluster and the following configurations as the evaluation process
+can take long
+
+```
+bsub -n 10 -q "gpu.24h" -R "rusage[mem=10000,ngpus_excl_p=1]" COMMAND
+```
+
 Run the following commands to **exactly** reproduce the results (as on Kaggle), using the already trained models:
 
 ```
@@ -85,7 +92,10 @@ python average.py squeezenet-encoder-dropouts_ext-half_post_p1 vanilla-unet_ext-
 Or run the `create_exact_submission.sh` file.
 
 
-Run the following commands to reproduce the results by training the models:
+Run the following commands to reproduce the results by training the models.
+**Please notice that this will delete the previous trained model** and it will be
+not be possible to exactly reproduce the results from the provided saved models.
+
 
 ```
 # We need to be at the road-segmentation level
