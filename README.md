@@ -64,8 +64,8 @@ This will generate a folder in output/{model_folder1}--{model_folder2}--avg.
 
 #### Reproducing Kaggle results
 
-We recommend running the following commands using the Leonhard cluster and the following configurations as the evaluation process
-can take long
+As the evaluation process might long, we recommend running the following commands
+on the Leonhard cluster using the following configurations
 
 ```
 bsub -n 10 -q "gpu.24h" -R "rusage[mem=10000,ngpus_excl_p=1]" COMMAND
