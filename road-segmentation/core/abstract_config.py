@@ -5,6 +5,13 @@ import tensorflow as tf
 
 class AbstractConfig(ABC):
 
+    """
+    class that holds the default values for the configuration
+    for each model there is a config file that inherits from this class
+    and can change certain parameters according to needs of the model
+
+    """
+
     def __init__(self, model_name: str, data: str):
 
         self.MODEL_NAME = model_name
@@ -40,7 +47,8 @@ class AbstractConfig(ABC):
             self.VALID_PATH_TO_GROUNDTRUTH = self.BASE_DIR + 'data/validation_extension_full/groundtruth'
             self.VALID_PATH_TO_ARRAYS = self.BASE_DIR + 'data/validation_extension_full/arrays/'
 
-
+        if not os.path.exists(self.VALID_PATH_TO_ARRAYS):
+            os.makedirs(self.VALID_PATH_TO_ARRAYS)
 
     BASE_DIR = './../'
 
@@ -104,10 +112,10 @@ class AbstractConfig(ABC):
     TEST_BATCH_SIZE = 20
 
     TEST_METHOD_NAME = 'patch'     # patch or full
-    TEST_METHOD_PATCH_SIZE = 200   # only for patch     -> here must be a single value but in actual config could be list
-    TEST_METHOD_STRIDE = 136        # only for patch    - > here must be a single value but in actual config could be list
+    TEST_METHOD_PATCH_SIZE = 200   # only for patch     -> here must be a single value but in actual config could be list to perform ensemble
+    TEST_METHOD_STRIDE = 136        # only for patch    - > here must be a single value but in actual config could be list to perform ensemble
 
-    TEST_ROTATION_DEGREE = 0   # can also be a list
+    TEST_ROTATION_DEGREE = 0   # can also be a list -> then it will perform ensemble
 
     TEST_N_PATCHES_PER_IMAGE = (TEST_IMAGE_SIZE - TEST_METHOD_PATCH_SIZE)/ TEST_METHOD_STRIDE + 1
 
@@ -136,7 +144,7 @@ class AbstractConfig(ABC):
      |___/\_,_|_.__/_|_|_|_/__/__/_\___/_||_|
 
     '''
-
+    # Configures the Submission to specify what outputs it should produce
     SUB_WRITE_PREDICTIONS = True
     SUB_WRITE_CSV = True
     SUB_WRITE_MASKS = True
@@ -180,6 +188,7 @@ class AbstractConfig(ABC):
      /_/ \_\_,_\__, |_|_|_\___|_||_\__\__,_|\__|_\___/_||_|
                |___/
     '''
+    # Configuration of the Augmentation pipeline
 
     GT_FOREGROUND_THRESHOLD = 0.25
 
@@ -230,6 +239,9 @@ class AbstractConfig(ABC):
     # with magnitudes proportional to the corresponding eigenvalues
     # times a random variable drawn from a Gaussian with mean and standard deviation
     AUG_COLOR_PCA_PROB = 0.7
+
+    # these eigenvectors and eigenvalues where separately computed using
+    # the pca_color_augmentation notebook in preprocessing
     AUG_COLOR_PCA_EVECS = np.array([[-0.59073215, 0.72858809, 0.34669139],
                                     [-0.57144203, -0.07443475, -0.81725973],
                                     [-0.56963982, -0.68089563, 0.46031686]])

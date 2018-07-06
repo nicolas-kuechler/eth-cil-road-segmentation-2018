@@ -5,15 +5,31 @@ from utility import util
 
 class Submission():
 
+    """
+    Given a set of predictions, this class will create the following files:
+    (if specified in configuration)
+    - submission: csv file to upload on kaggle
+    - predictions: a 608 x 608 pixel mask where each pixel has a value between 0 and 1
+    - overlays: the original image overlayed with the predictions
+    - masks: a 608 x 608 pixel mask where each 16x16 patch of pixels is either 0 or 1
+    - mask overlays: the original image overlayed with the masks
+    """
+
     def __init__(self, config):
         self.config = config
         self.predictions = {}
 
     def add(self, prediction, img_id):
+        """
+        add a prediction of the image with the img_id
+        """
         self.predictions[img_id] = prediction
         self.is_built = False
 
     def write(self):
+        """
+        first builds the submission and then writes the output files
+        """
         print('Starting Submission...')
         self.build()
 
@@ -35,7 +51,9 @@ class Submission():
         print('Submission Finished')
 
     def build(self):
-        # ATTENTION: self.db[img_id][col][row] = label
+        """
+        loop over all added predictions and calculate a label per patch
+        """
         self.db = {}
         patch_size = 16
 
@@ -50,6 +68,9 @@ class Submission():
         self.is_built = True
 
     def write_predictions(self):
+        """
+        write predictions to specified directory
+        """
         out_dir = self.config.TEST_OUTPUT_DIR + 'predictions/'
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
@@ -61,6 +82,9 @@ class Submission():
             img.save(out_dir + f'test_{img_id}.png')
 
     def write_csv(self):
+        """
+        write submission csv to specified directory
+        """
         assert(self.is_built), 'predictions where added since last build'
         model_name = self.config.MODEL_NAME
         out_dir = self.config.TEST_OUTPUT_DIR + 'csv/'
@@ -82,6 +106,9 @@ class Submission():
 
 
     def write_masks(self):
+        """
+        write masks to specified directory
+        """
         assert(self.is_built), 'predictions where added since last build'
 
         out_dir = self.config.TEST_OUTPUT_DIR + 'masks/'
@@ -95,6 +122,10 @@ class Submission():
             img.save(out_dir + f'test_{img_id}.png')
 
     def write_mask_overlays(self):
+        """
+        write mask overlays to specified directory
+        """
+
         assert(self.is_built), 'predictions where added since last build'
 
         out_dir = self.config.TEST_OUTPUT_DIR + 'mask_overlays/'
@@ -114,6 +145,9 @@ class Submission():
             overlay.save(out_dir + f'test_{img_id}.png')
 
     def write_overlays(self):
+        """
+        write overlays to specified directory
+        """
         out_dir = self.config.TEST_OUTPUT_DIR + 'overlays/'
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
@@ -128,6 +162,9 @@ class Submission():
             overlay.save(out_dir + f'test_{img_id}.png')
 
     def __build_masks(self):
+        """
+        builds the 16x16 patch masks
+        """
         patch_size = 16
 
         patch = {
@@ -141,14 +178,18 @@ class Submission():
                 self.masks[img_id] = np.zeros((self.config.TEST_IMAGE_SIZE, self.config.TEST_IMAGE_SIZE))
             self.masks[img_id][i:i + patch_size, j:j + patch_size] = patch[label]
 
-    # overlay the two images
     def __to_overlay(self, bg, overlay, alpha=0.5):
+        """
+        overlays the two images
+        """
         bg = bg.convert('RGBA')
         overlay = overlay.convert('RGBA')
         return Image.blend(bg, overlay, alpha)
 
-    # assign a label to a patch
     def __patch_to_label(self, patch):
+        """
+        assign a label to the patch
+        """
         df = np.mean(patch)
         if df > self.config.TEST_PATCH_FOREGROUND_THRESHOLD:
             return 1

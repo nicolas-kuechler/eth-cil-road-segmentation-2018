@@ -44,6 +44,13 @@ class Model(AbstractModel):
             self.optimize()
 
     def fire_module(self, input, layer_number, connections):
+        """
+        Creates a fire module based on the paper implementation
+        :param input: A tensor with the data to be processed
+        :param layer_number: The fire module number, used for the var scope
+        :param connections: An array with the stored outputs from each layer
+        :return:
+        """
         if self.config.MAX_POOLS[layer_number]:
             with tf.variable_scope('maxpool' + str(layer_number)):
                 input = tf.layers.max_pooling2d(inputs=input, pool_size=3, strides=2, padding='same')
@@ -68,6 +75,13 @@ class Model(AbstractModel):
         return input, connections
 
     def inverse_fire_module(self, input, layer_number, connections):
+        """
+        Creates an inverted fire module
+        :param input: A tensor with the data to be processed
+        :param layer_number: The inverted fire module number, used for the var scope
+        :param connections: An array with the stored outputs to be added to the corresponding module
+        :return:
+        """
         with tf.variable_scope('inverse_fire_module' + str(layer_number)):
             with tf.name_scope(name='expand'):
                 input = tf.layers.conv2d(inputs=input, filters=self.config.FILTERS_EXPAND3[-layer_number-1],
@@ -86,6 +100,10 @@ class Model(AbstractModel):
         return input
 
     def check_configs(self):
+        """
+        Make sure we comply with the thumb rules defined in the paper
+        :return:
+        """
         assert (self.config.N_fire_modules == len(self.config.FILTERS_SQUEEZE1))
         assert (self.config.N_fire_modules == len(self.config.FILTERS_EXPAND1))
         assert (self.config.N_fire_modules == len(self.config.FILTERS_EXPAND3))
