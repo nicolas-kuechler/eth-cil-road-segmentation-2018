@@ -1,7 +1,11 @@
 tensorflow==1.8
+Pillow==5.2.0
+tqdm==4.23.4
+matplotlib==2.2.2
 numpy==1.14.5
 augmentor==0.2.2
 scipy==1.1
+scikit-learn==0.19.1
 scikit-image==0.14
 paramiko==2.4.1
 scp==0.11
