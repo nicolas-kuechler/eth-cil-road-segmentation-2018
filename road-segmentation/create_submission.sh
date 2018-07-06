@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# We need to remove the previous trained models if any
+rm -r ../output/vanilla-unet_ext-full
+rm -r ../output/squeezenet-encoder-dropouts_ext-half
+
+
 # vanilla-unet training full dataset
 echo "Starting to train the vanilla unet with full extended dataset"
 python main.py vanilla-unet train ext-full
