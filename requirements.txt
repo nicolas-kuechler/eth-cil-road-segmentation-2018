@@ -7,7 +7,7 @@ augmentor==0.2.2
 scipy==1.1
 scikit-learn==0.19.1
 scikit-image==0.14
-paramiko==2.4.1
+paramiko==2.4.2
 scp==0.11
 Cython==0.28.3
 pydensecrf==1.0rc3
